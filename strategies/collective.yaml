@@ -1,0 +1,38 @@
+
+
+super_bullish_planets:
+  - 'jupiter'
+  - 'venus'
+
+bullish_planets:
+  - 'sun'
+  - 'mercury'
+
+super_bearish_planets:
+  - 'saturn'
+  - 'mars'
+
+unclear_planets:
+  - 'pluto'
+  - 'neptune'
+  - 'uranus'
+  - 'moon'
+
+investing_houses:
+  - 2
+  - 5
+  - 8
+
+good_luck_houses:
+  - 4
+  - 9
+  - 10
+  - 11
+
+other_houses:
+  - 1
+  - 3
+  - 6
+  - 7
+  - 12
+

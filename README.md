@@ -40,12 +40,14 @@ https://json.astrologyapi.com:443 "POST /v1/tropical_transits/daily?header=Conte
 🟨 Collective index updated to: -9
 ```
 
+
 <br>
 
 
-----
 
-## todo
+### todo
+
 
 * [move out from setup.py](https://blog.ganssle.io/articles/2021/10/setup-py-deprecated.html), fix makefile, etc.
 * unit tests
+

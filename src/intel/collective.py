@@ -16,12 +16,22 @@ class Collective:
         self.houses_now = {h: [] for h in range(1, 13)}
         self.planets_now = {}
         self.retrogrades_now = []
+
+        #TODO: move this to yaml
         self.transit_now = {t: [] for t in ['conjunction', 'trine', 'square', 'opposition', 'sextile']}
+
+        self.ranking = self._get_ranking_scale()
 
 
     #############################
     #       Private methods
     #############################
+    def _get_ranking_scale(self) -> dict:
+        """Get ranking scale."""
+    
+        return os.load_yaml(self.env_vars['STRATEGIES_RANKING'])
+        
+
     def _request_transits_daily(self) -> dict:
         """Request transits daily from API."""
 
@@ -56,8 +66,9 @@ class Collective:
         for t in transit_relation:
             planet1 = t['natal_planet'].lower()
             planet2 = t['transit_planet'].lower()
-            orb = t['orb']
+
             transit_type = t['type'].lower()
+            orb = float(t['orb'])
 
             if planet1 == planet2:
                 continue
@@ -69,64 +80,80 @@ class Collective:
         """Create index from transits daily."""
         
         index = 0
-        intel = os.load_yaml(self.env_vars['STRATEGIES_GENERAL'])
+        collective_intel = os.load_yaml(self.env_vars['STRATEGIES_COLLECTIVE'])
+        general_intel = os.load_yaml(self.env_vars['STRATEGIES_GENERAL'])
 
         ##################################
         ### Look at super bullish transits
         ##################################
-        super_bullish_planets = intel['super_bullish_planets']
-        investing_houses = intel['investing_houses']
-        planets_exaltation = intel['planets_exaltation']
+
+        super_bullish_planets = collective_intel['super_bullish_planets']
+        investing_houses = collective_intel['investing_houses']
+        planets_exaltation = general_intel['planets_exaltation']
 
         for planet in super_bullish_planets:
+            
             if self.planets_now[planet] in planets_exaltation:
                 os.log_debug(f'{planet} is exalted in {self.planets_now[planet]}')
-                index += 5
+                index += float(self.ranking['exalted'])
+            
             if planet in self.retrogrades_now:
                 os.log_debug(f'{planet} is retrograde')
-                index -= 3
+                index -= float(self.ranking['retrograde'])
+            
             for house in investing_houses:
                 if planet in self.houses_now[house]:
                     os.log_debug(f'{planet} is in house {house}')
-                    index += 10
+                    index += float(self.ranking['super_bullish'])
+
         
         ##################################
         ### Look at bullish transits
         ##################################
-        bullish_planets = intel['bullish_planets']
+
+        bullish_planets = collective_intel['bullish_planets']
+        
         for planet in bullish_planets:
+            
             if self.planets_now[planet] in planets_exaltation:
                 os.log_debug(f'{planet} is exalted in {self.planets_now[planet]}')
-                index += 1
+                index += float(self.ranking['exalted'])
+            
             if planet in self.retrogrades_now:
                 os.log_debug(f'{planet} is retrograde')
-                index -= 1
+                index -= float(self.ranking['retrograde'])
+            
             for house in investing_houses:
                 if planet in self.houses_now[house]:
                     os.log_debug(f'{planet} is in house {house}')
-                    index += 5
+                    index += float(self.ranking['bullish'])
+
 
         ##################################
         ### Look at bearish transits
         ##################################
-        bearish_planets = intel['super_bearish_planets']
-        bearish_houses = intel['other_houses']
+        bearish_planets = collective_intel['super_bearish_planets']
+        bearish_houses = collective_intel['other_houses']
+        
         for planet in bearish_planets:
+            
             if self.planets_now[planet] in planets_exaltation:
                 os.log_debug(f'{planet} is exalted in {self.planets_now[planet]}')
-                index -= 2
+                index -= float(self.ranking['detriment'])
+            
             if planet in self.retrogrades_now:
                 os.log_debug(f'{planet} is retrograde')
-                index -= 1
+                index -= float(self.ranking['retrograde'])
+            
             for house in investing_houses:
                 if planet in self.houses_now[house]:
                     os.log_debug(f'{planet} is in house {house}')
-                    index -= 5
+                    index -= float(self.ranking['bearish'])
+            
             for house in bearish_houses:
                 if planet in self.houses_now[house]:
                     os.log_debug(f'{planet} is in house {house}')
-                    index -= 2
-
+                    index -= float(self.ranking['super_bearish'])
 
         return index
 
@@ -137,8 +164,11 @@ class Collective:
     def get_collective_forecast_now(self) -> None:
         """Get collective forecast now."""
 
-        astro_data = self._request_transits_daily()
-        self._parse_data_transits_daily(astro_data)
+        data = self._request_transits_daily()
+        self._parse_data_transits_daily(data)
+        
         this_index = self._create_index_transits_daily()
-        os.log_debug(f'Collective index updated to: {this_index}')
+        
         self.collective_index += this_index
+        os.log_info(f'Collective index updated to: {this_index}')
+
