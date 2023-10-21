@@ -56,6 +56,7 @@ class Collective:
             if bool(obj['is_retrograde']):
                 self.retrogrades_now.append(planet)
 
+        ## Print the data
         os.log_debug(f'Ascendant now: {self.ascendant_now}')
         os.log_debug(f'Signs of planets now: {self.planets_now}')
         os.log_debug(f'Planets in houses now: {self.houses_now}')
@@ -65,6 +66,7 @@ class Collective:
         for t in transit_relation:
             planet1 = t['natal_planet'].lower()
             planet2 = t['transit_planet'].lower()
+
             transit_type = t['type'].lower()
             orb = float(t['orb'])
 
@@ -84,6 +86,7 @@ class Collective:
         ##################################
         ### Look at super bullish transits
         ##################################
+
         super_bullish_planets = collective_intel['super_bullish_planets']
         investing_houses = collective_intel['investing_houses']
         planets_exaltation = general_intel['planets_exaltation']
@@ -102,10 +105,12 @@ class Collective:
                 if planet in self.houses_now[house]:
                     os.log_debug(f'{planet} is in house {house}')
                     index += float(self.ranking['super_bullish'])
+
         
         ##################################
         ### Look at bullish transits
         ##################################
+
         bullish_planets = collective_intel['bullish_planets']
         
         for planet in bullish_planets:
@@ -122,6 +127,7 @@ class Collective:
                 if planet in self.houses_now[house]:
                     os.log_debug(f'{planet} is in house {house}')
                     index += float(self.ranking['bullish'])
+
 
         ##################################
         ### Look at bearish transits
@@ -165,3 +171,4 @@ class Collective:
         
         self.collective_index += this_index
         os.log_info(f'Collective index updated to: {this_index}')
+

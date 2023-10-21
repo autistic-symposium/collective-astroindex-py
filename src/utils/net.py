@@ -33,6 +33,7 @@ def get_lat_and_lon_at_given_city(city: str, country: str) -> tuple:
 
     if not city or not country:
         os.log_info('No city or country provided. Using current location.')
+
         location = geocoder.ip('me')
     else:
         location = geocoder.osm(f'{city}, {country}')
