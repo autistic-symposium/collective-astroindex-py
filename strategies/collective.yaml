@@ -1,4 +1,6 @@
-
+# this is a list of all the strategies that are used in the collective strategy
+# they are generally used to determine the overall market sentiment
+# and they are a high level intel of transits
 
 super_bullish_planets:
   - 'jupiter'

@@ -1,3 +1,7 @@
+# this is the default ranking for the strategies
+# the ranking is used to determine the overall market sentiment
+# these values are experimental and not normalized
+
 super_bullish: 10
 exalted: 5
 bullish: 5
