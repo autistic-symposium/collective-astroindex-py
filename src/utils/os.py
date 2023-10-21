@@ -6,8 +6,6 @@ import sys
 import logging
 from pathlib import Path
 from dotenv import load_dotenv
-import requests
-from urllib.parse import urljoin
 from pprint import PrettyPrinter
 
 
@@ -42,6 +40,7 @@ def load_config() -> dict:
     try:
         env_vars['API_KEY'] = os.getenv('API_KEY')
         env_vars['USER_ID'] = os.getenv('USER_ID')
+        env_vars['API_URL'] = os.getenv('API_URL')
         set_logging(os.getenv('LOG_LEVEL'))
 
         return env_vars
@@ -73,23 +72,6 @@ def exit_with_error(message) -> None:
 
     log_error(message)
     sys.exit(1)
-
-
-def send_request(url, data=None, auth=None, params=None) -> dict:
-    """Wrapper for requests package."""
-
-    if not params:
-        params = {'header': 'Content-Type: application/json'}
-
-    try:
-        r = requests.post(url, data=data, auth=auth, params=params)
-
-    except requests.exceptions.HTTPError as e:
-        raise Exception(f'{url}: {e.response.text}')
-    if r.status_code == 200:
-        return r.json()
-    else:
-        logging.error(f'🚨 Query failed: HTTP code {r.status_code}')
 
 
 def pprint(data: dict, indent=None) -> None:

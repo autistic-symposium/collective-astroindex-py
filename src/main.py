@@ -5,7 +5,7 @@
 import argparse
 
 from src.utils.os import load_config
-import src.astro.collective as astro
+from src.analytics.collective import get_collective_forecast_now
 
 
 def run_menu() -> argparse.ArgumentParser:
@@ -23,7 +23,7 @@ def run() -> None:
     args = parser.parse_args()
 
     if args.collective:
-        astro.get_collective_forecast_today(env_vars)
+        get_collective_forecast_now(env_vars)
 
     else:
         parser.print_help()

@@ -1,0 +1,53 @@
+houses_by_element:
+  1: 'fire'
+  2: 'earth'
+  3: 'air'
+  4: 'water'
+  5: 'fire'
+  6: 'earth'
+  7: 'air'
+  8: 'water'
+  10: 'earth'
+  11: 'air'
+  12: 'water'
+
+signs_by_element:
+  'aries': fire
+  'taurus': earth
+  'gemini': air
+  'cancer': water
+  'leo': fire
+  'virgo': earth
+  'libra': air
+  'scorpio': water
+  'sagittarius': fire
+  'capricorn': earth
+  'aquarius': air
+  'pisces': water
+
+houses_by_sign:
+  1: 'aries'
+  2: 'taurus'
+  3: 'gemini'
+  4: 'cancer'
+  5: 'leo'
+  6: 'virgo'
+  7: 'libra'
+  8: 'scorpio'
+  9: 'sagittarius'
+  10: 'capricorn'
+  11: 'aquarius'
+  12: 'pisces'
+
+positive_planets:
+  - 'sun'
+  - 'jupiter'
+  - 'venus'
+
+negative_planets:
+  - 'saturn'
+  - 'mars'
+
+neutral_planets:
+  - 'mercury'
+  - 'moon'
