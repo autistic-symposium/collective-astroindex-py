@@ -38,11 +38,15 @@ def load_config() -> dict:
     load_dotenv(env_file)
 
     try:
+        set_logging(os.getenv('LOG_LEVEL'))
+
         env_vars['API_KEY'] = os.getenv('API_KEY')
         env_vars['USER_ID'] = os.getenv('USER_ID')
         env_vars['API_URL'] = os.getenv('API_URL')
+
         env_vars['STRATEGIES_GENERAL'] = os.getenv('STRATEGIES_GENERAL')
-        set_logging(os.getenv('LOG_LEVEL'))
+        env_vars['STRATEGIES_COLLECTIVE'] = os.getenv('STRATEGIES_COLLECTIVE')
+        env_vars['STRATEGIES_RANKING'] = os.getenv('STRATEGIES_RANKING')
 
         return env_vars
 
