@@ -4,7 +4,6 @@
 import time
 import geocoder
 import requests
-
 from dateutil import tz
 from datetime import datetime
 from urllib.parse import urljoin
@@ -13,7 +12,7 @@ from timezonefinder import TimezoneFinder
 import src.utils.os as os
 
 
-def send_request(url, data=None, auth=None, params=None) -> dict:
+def send_request(url: str, data=None, auth=None, params=None) -> dict:
     """Wrapper for requests calls."""
 
     if not params:
@@ -29,7 +28,7 @@ def send_request(url, data=None, auth=None, params=None) -> dict:
         os.log_error(f'Query failed: HTTP code {r.status_code}')
 
 
-def get_lat_and_lon_at_given_city(city, country) -> tuple:
+def get_lat_and_lon_at_given_city(city: str, country: str) -> tuple:
     """Get latitude and longitude from a city and country."""
 
     if not city or not country:
@@ -41,11 +40,13 @@ def get_lat_and_lon_at_given_city(city, country) -> tuple:
     return (location.lat, location.lng)
 
 
-def get_date_from_timezone(tzone_name):
+def get_date_from_timezone(tzone_name: str):
+    """Get date from a timezone name"""
+
     return datetime.now(tz=tz.gettz(tzone_name))
 
 
-def get_timezone_offset_at_given_location(lat, lon) -> float:
+def get_timezone_offset_at_given_location(lat: float, lon: float) -> (str, float):
     """Get timezone offset from UTC."""
 
     t = TimezoneFinder()
@@ -55,8 +56,9 @@ def get_timezone_offset_at_given_location(lat, lon) -> float:
     return tzone_name, float(tzone) if tzone[0] != '-' else -float(tzone[1:])
 
     
-def get_local_tzone_name():
+def get_local_tzone_name() -> str:
     """Get local timezone."""
+
     return time.strftime('%z', time.localtime())
   
 
@@ -72,8 +74,8 @@ def get_datetime_now_at_given_timezone(tzone_name=None) -> dict:
     return now.day, now.month, now.year, now.hour, now.minute
 
 
-def get_timespace(day=None, month=None, year=None, hour=None, mins=None, lat=None, \
-                  lon=None, tzone=None, city=None, country=None):
+def get_timespace_dict(day=None, month=None, year=None, hour=None, mins=None, lat=None, \
+                  lon=None, tzone=None, city=None, country=None) -> dict:
     """Craft data to send to the API."""
 
     if not lat or not lon:
@@ -100,7 +102,7 @@ def get_timespace(day=None, month=None, year=None, hour=None, mins=None, lat=Non
     }    
 
     
-def craft_request(env_vars, endpoint, data):
+def craft_request(env_vars, endpoint, data) -> dict:
     """Send request to a designed endpoint in the API."""
 
     api_key = env_vars['API_KEY']

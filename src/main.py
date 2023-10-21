@@ -5,16 +5,15 @@
 import argparse
 
 from src.utils.os import load_config
-from src.analytics.collective import get_collective_forecast_now
+from src.intel.collective import Collective
 
 
 def run_menu() -> argparse.ArgumentParser:
 
-    parser = argparse.ArgumentParser(description='✨ Astro Index ✨')
-    parser.add_argument('-c', dest='collective', action='store_true',
-                        help='Forecast for collective for the week')
+    parser = argparse.ArgumentParser(description='✨ Choices ✨')
+    parser.add_argument('-cn', dest='collective_now', action='store_true',
+                        help='Forecast for the collective now.')
     return parser
-
 
 def run() -> None:
 
@@ -22,8 +21,10 @@ def run() -> None:
     parser = run_menu()
     args = parser.parse_args()
 
-    if args.collective:
-        get_collective_forecast_now(env_vars)
+    # TODO: Add argument for city and country
+    if args.collective_now:
+        c = Collective(env_vars)
+        c.get_collective_forecast_now()
 
     else:
         parser.print_help()

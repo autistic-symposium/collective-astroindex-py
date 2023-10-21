@@ -4,7 +4,7 @@ setup(
     name="choices",
     version='0.1',
     packages=find_packages(include=['src', \
-                    'src.analytics', \
+                    'src.intel', \
                     'src.utils']),
     author="bt3gl",
     install_requires=['python-dotenv'],
