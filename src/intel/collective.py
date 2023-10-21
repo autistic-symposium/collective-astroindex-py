@@ -106,6 +106,27 @@ class Collective:
                     os.log_debug(f'{planet} is in house {house}')
                     index += 5
 
+        ##################################
+        ### Look at bearish transits
+        ##################################
+        bearish_planets = intel['super_bearish_planets']
+        bearish_houses = intel['other_houses']
+        for planet in bearish_planets:
+            if self.planets_now[planet] in planets_exaltation:
+                os.log_debug(f'{planet} is exalted in {self.planets_now[planet]}')
+                index -= 2
+            if planet in self.retrogrades_now:
+                os.log_debug(f'{planet} is retrograde')
+                index -= 1
+            for house in investing_houses:
+                if planet in self.houses_now[house]:
+                    os.log_debug(f'{planet} is in house {house}')
+                    index -= 5
+            for house in bearish_houses:
+                if planet in self.houses_now[house]:
+                    os.log_debug(f'{planet} is in house {house}')
+                    index -= 2
+
 
         return index
 
