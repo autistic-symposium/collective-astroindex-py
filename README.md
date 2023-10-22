@@ -68,6 +68,7 @@ https://json.astrologyapi.com:443 "POST /v1/tropical_transits/daily?header=Conte
 * plot things with numpy, etc.
 * fix readme with examples
 * create an api
+    * dockerize
 * add support to other aspects
 * add linter
 * backtest results on real data
@@ -77,5 +78,6 @@ https://json.astrologyapi.com:443 "POST /v1/tropical_transits/daily?header=Conte
 * do token chart
     - synatry with token chart
 * finish complete aspects.yaml
+* research llama and all
 
 
