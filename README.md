@@ -69,4 +69,13 @@ https://json.astrologyapi.com:443 "POST /v1/tropical_transits/daily?header=Conte
 * fix readme with examples
 * create an api
 * add support to other aspects
+* add linter
+* backtest results on real data
+* forecast with moon
+* do natal chart
+    - do natal_transits daily and weekly
+* do token chart
+    - synatry with token chart
+* finish complete aspects.yaml
+
 

@@ -1,0 +1,303 @@
+# this is a list of possible aspects that are used in the strategies
+# classified by bullish and bearish indexes in non_normalized_ranking.yaml
+
+
+planet_order:
+  'moon': 1
+  'sun': 2
+  'mercury': 3
+  'venus': 4
+  'mars': 5
+  'jupiter': 6
+  'saturn': 7
+  'uranus': 8
+  'neptune': 9
+  'pluto': 10
+
+
+moon:
+  'conjunction':
+      'sun': unclear
+      'mercury': unclear
+      'venus': unclear
+      'mars': unclear
+      'jupiter': unclear
+      'saturn': unclear
+      'uranus': unclear
+      'neptune': unclear
+      'pluto': unclear
+  'opposition':
+      'sun': unclear
+      'mercury': unclear
+      'venus': unclear
+      'mars': unclear
+      'jupiter': unclear
+      'saturn': unclear
+      'uranus': unclear
+      'neptune': unclear
+      'pluto': unclear
+  'trine':
+      'sun': unclear
+      'mercury': unclear
+      'venus': unclear
+      'mars': unclear
+      'jupiter': unclear
+      'saturn': unclear
+      'uranus': unclear
+      'neptune': unclear
+      'pluto': unclear
+  'square':
+      'sun': unclear
+      'mercury': unclear
+      'venus': unclear
+      'mars': unclear
+      'jupiter': unclear
+      'saturn': unclear
+      'uranus': unclear
+      'neptune': unclear
+      'pluto': unclear
+  'sextile':
+      'sun': unclear
+      'mercury': unclear
+      'venus': unclear
+      'mars': unclear
+      'jupiter': unclear
+      'saturn': unclear
+      'uranus': unclear
+      'neptune': unclear
+      'pluto': unclear
+
+sun:
+  'conjunction': 
+    'mercury': unclear
+    'venus': unclear
+    'mars': unclear
+    'jupiter': unclear
+    'saturn': unclear
+    'uranus': unclear
+    'neptune': unclear
+    'pluto': unclear
+  'opposition':
+    'mercury': unclear
+    'venus': unclear
+    'mars': unclear
+    'jupiter': unclear
+    'saturn': unclear
+    'uranus': unclear
+    'neptune': unclear
+    'pluto': unclear
+  'trine':
+    'mercury': unclear
+    'venus': unclear
+    'mars': unclear
+    'jupiter': unclear
+    'saturn': unclear
+    'uranus': unclear
+    'neptune': unclear
+    'pluto': unclear
+  'square':
+    'mercury': unclear
+    'venus': unclear
+    'mars': unclear
+    'jupiter': unclear
+    'saturn': unclear
+    'uranus': unclear
+    'neptune': unclear
+    'pluto': unclear
+  'sextile':
+    'mercury': unclear
+    'venus': unclear
+    'mars': unclear
+    'jupiter': unclear
+    'saturn': unclear
+    'uranus': unclear
+    'neptune': unclear
+    'pluto': unclear
+
+mercury:
+  'conjunction':
+    'venus': unclear
+    'mars': unclear
+    'jupiter': unclear
+    'saturn': unclear
+    'uranus': unclear
+    'neptune': unclear
+    'pluto': unclear
+  'opposition':
+    'venus': unclear
+    'mars': unclear
+    'jupiter': unclear
+    'saturn': unclear
+    'uranus': unclear
+    'neptune': unclear
+    'pluto': unclear
+  'trine':
+    'venus': unclear
+    'mars': unclear
+    'jupiter': unclear
+    'saturn': unclear
+    'uranus': unclear
+    'neptune': unclear
+    'pluto': unclear
+  'square':
+    'venus': unclear
+    'mars': unclear
+    'jupiter': unclear
+    'saturn': unclear
+    'uranus': unclear
+    'neptune': unclear
+    'pluto': unclear
+  'sextile':
+    'venus': unclear
+    'mars': unclear
+    'jupiter': unclear
+    'saturn': unclear
+    'uranus': unclear
+    'neptune': unclear
+    'pluto': unclear
+
+venus:
+  'conjunction':
+    'mars': unclear
+    'jupiter': super_bullish
+    'saturn': unclear
+    'uranus': unclear
+    'neptune': unclear
+    'pluto': unclear
+  'opposition':
+    'mars': unclear
+    'jupiter': unclear
+    'saturn': unclear
+    'uranus': unclear
+    'neptune': unclear
+    'pluto': unclear
+  'trine':
+    'mars': unclear
+    'jupiter': super_bullish
+    'saturn': unclear
+    'uranus': unclear
+    'neptune': unclear
+    'pluto': unclear
+  'square':
+    'mars': unclear
+    'jupiter': unclear
+    'saturn': unclear
+    'uranus': unclear
+    'neptune': unclear
+    'pluto': unclear
+  'sextile':
+    'mars': unclear
+    'jupiter': bullish
+    'saturn': unclear
+    'uranus': unclear
+    'neptune': unclear
+    'pluto': unclear
+  
+mars:
+  'conjunction': 
+    'jupiter': unclear
+    'saturn': unclear
+    'neptune': unclear
+    'pluto': unclear
+  'opposition': 
+    'jupiter': unclear
+    'saturn': unclear
+    'uranus': unclear
+    'neptune': unclear
+    'pluto': unclear
+  'trine':
+    'jupiter': unclear
+    'saturn': unclear
+    'uranus': unclear
+    'neptune': unclear
+    'pluto': unclear
+  'square':
+    'jupiter': unclear
+    'saturn': unclear
+    'uranus': unclear
+    'neptune': unclear
+    'pluto': unclear
+  'sextile':
+    'jupiter': unclear
+    'saturn': unclear
+    'uranus': unclear
+    'neptune': unclear
+    'pluto': unclear
+  
+jupiter:
+ 'conjunction':
+    'saturn': unclear
+    'uranus': unclear
+    'neptune': unclear
+    'pluto': unclear
+  'opposition':
+    'saturn': unclear
+    'uranus': unclear
+    'neptune': unclear
+    'pluto': unclear
+  'trine':
+    'saturn': unclear
+    'uranus': unclear
+    'neptune': unclear
+    'pluto': unclear
+  'square':
+    'saturn': unclear
+    'uranus': unclear
+    'neptune': unclear
+    'pluto': unclear
+  'sextile':
+    'saturn': unclear
+    'uranus': unclear
+    'neptune': unclear
+    'pluto':   unclear
+  
+saturn:
+  'conjunction':
+    'uranus': unclear
+    'neptune': unclear
+    'pluto': unclear
+  'opposition':
+    'uranus': unclear
+    'neptune': unclear
+    'pluto': unclear
+  'trine':
+    'uranus': unclear
+    'neptune': unclear
+    'pluto': unclear
+  'square':
+    'uranus': unclear
+    'neptune': unclear
+    'pluto': unclear
+  'sextile':
+    'uranus': unclear
+    'neptune': unclear
+    'pluto': unclear
+  
+uranus:
+  'conjunction':
+    'neptune': unclear
+    'pluto': unclear
+  'opposition':
+    'neptune': unclear
+    'pluto': unclear
+  'trine':
+    'neptune': unclear
+    'pluto': unclear
+  'square':
+    'neptune': unclear
+    'pluto': unclear
+  'sextile':
+    'neptune': unclear
+    'pluto': unclear
+  
+neptune:
+  'conjunction':
+    'pluto': unclear
+  'opposition':
+    'pluto': unclear
+  'trine':
+    'pluto': unclear
+  'square':
+    'pluto': unclear
+  'sextile':
+    'pluto': unclear
