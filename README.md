@@ -14,6 +14,9 @@
 
 ### collective index
 
+![Screenshot 2023-10-21 at 10 05 41 PM](https://github.com/choices-game/astroindex-py/assets/1130416/131c7deb-94b2-4152-bd68-3af53b09af8d)
+
+<br>
 
 ```bash
 > choices -cn
