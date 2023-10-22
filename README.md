@@ -79,5 +79,13 @@ https://json.astrologyapi.com:443 "POST /v1/tropical_transits/daily?header=Conte
     - synatry with token chart
 * finish complete aspects.yaml
 * research llama and all
+* normalize and tune the indexes
+* find a better moon api
+    - https://www.worldweatheronline.com/weather-api/api/astronomy-api.aspx
+    - https://www.aerisweather.com/support/docs/api/reference/endpoints/sunmoon-moonphases/
+    - https://www.meteomatics.com/en/api/available-parameters/moon/#moon_phase
+
+
+
 
 

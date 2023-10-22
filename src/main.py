@@ -20,6 +20,8 @@ def run_menu() -> argparse.ArgumentParser:
                         help='Forecast for the collective in a custom date range.')
     parser.add_argument('-c', dest='collective', action='store_true',
                         help='Forecast for the collective (all intel).')
+    parser.add_argument('-m', dest='moon', action='store_true',
+                        help='Moon phase.')
     return parser
 
 def run() -> None:
@@ -48,11 +50,18 @@ def run() -> None:
         if PRINT_PLOT:
             plot_collective(c.transit_index, "Collective Transit Index (daily))")
     
+    elif args.moon:
+        c = Collective(env_vars)
+        c.get_collective_forecast_moon()
+        if PRINT_PLOT:
+            plot_collective(c.moon_phase, "Moon Phase")
+    
     elif args.collective:
         c = Collective(env_vars)
         c.get_collective_forecast_today()
         c.get_collective_forecast_monthly()
         c.get_collective_forecast_custom()
+        c.get_collective_forecast_moon()
         plot_collective(c.transit_index, "Collective Transit Index (all intel))")
         
     else:

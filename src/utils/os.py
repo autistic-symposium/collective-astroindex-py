@@ -47,6 +47,7 @@ def load_config() -> dict:
         env_vars['STRATEGIES_GENERAL'] = os.getenv('STRATEGIES_GENERAL')
         env_vars['STRATEGIES_COLLECTIVE'] = os.getenv('STRATEGIES_COLLECTIVE')
         env_vars['STRATEGIES_RANKING'] = os.getenv('STRATEGIES_RANKING')
+        env_vars['STRATEGIES_MOON'] = os.getenv('STRATEGIES_MOON')
 
         return env_vars
 

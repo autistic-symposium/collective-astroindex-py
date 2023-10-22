@@ -25,12 +25,15 @@ class Collective:
         self.transit_now = {t: [] for t in ['conjunction', 'trine', 'square', 'opposition', 'sextile']}
         self.transit_monthly = {}
         self.transit_now_custom = {}
+        self.transit_moon = {}
 
         self.transit_index = {}
         self.ranking = self._get_ranking_scale()
 
+        # TODO: move to a setup() func
         self.collective_intel = os.load_yaml(self.env_vars['STRATEGIES_COLLECTIVE'])
         self.general_intel = os.load_yaml(self.env_vars['STRATEGIES_GENERAL'])
+        self.moon_intel = os.load_yaml(self.env_vars['STRATEGIES_MOON'])
 
 
     ####################################################
@@ -60,6 +63,13 @@ class Collective:
         """Request custom transits daily from API."""
 
         endpoint = 'natal_transits/daily'
+        return net.craft_request(self.env_vars, endpoint, self.timespace)
+
+
+    def  _request_transits_moon(self) -> dict:
+        """Request moon phase from API."""
+
+        endpoint = 'moon_phase_report'
         return net.craft_request(self.env_vars, endpoint, self.timespace)
 
 
@@ -193,6 +203,16 @@ class Collective:
                 self.transit_now_custom[this_date].append(this_value)
             else:
                 self.transit_now_custom[this_date] = [this_value]
+
+
+    def _parse_data_transits_moon(self, data: dict) -> None:
+        """Parse data from moon phase."""
+
+        self.moon_phase[data['considered_date']] = data['moon_phase']
+        significance = data['significance']
+
+        print(f'Moon phase: {self.moon_phase}')
+        print(f'Significance: {significance}')
 
 
     ####################################################
@@ -331,6 +351,24 @@ class Collective:
                         self.transit_index[date] -= float(self.ranking['bearish'])
 
 
+    def _create_index_transits_moon(self) -> dict:
+        """Create index from moon phase."""
+
+        this_index = 0
+        moon_phases_ranking = self.moon_intel['phase']
+
+        for date, phase in self.moon_phase.items():
+            this_ranking = moon_phases_ranking[phase]
+            this_index += float(self.ranking[this_ranking])
+
+        if date in self.transit_index:
+            self.transit_index[date] += this_index
+        else:
+            self.transit_index[date] = this_index
+
+        return this_index
+
+
     #############################
     #       Public methods
     #############################
@@ -438,3 +476,26 @@ class Collective:
         
         self._create_index_transits_daily_custom()
         os.log_info(f'Daily custom indexes: {self.transit_index}')
+
+
+    # TODO: move moon to other class?
+    def get_collective_forecast_moon(self) -> None:
+        """ 
+            Get moon phase forecast.
+
+            {
+                "considered_date": "2-10-2017",
+                "moon_phase": "Balsamic Moon",
+                "significance": 
+            }
+        """
+
+        # TODO: get other times
+        os.log_info(f'Getting collective forecast moon...')
+        data = self._request_transits_moon()
+        
+        self._parse_data_transits_moon(data)
+        
+        this_index = self._create_index_transits_moon()
+        os.log_info(f'Moon phases: {self.moon_phase}')
+        os.log_info(f'Moon index: {this_index}')
