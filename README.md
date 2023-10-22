@@ -58,4 +58,6 @@ https://json.astrologyapi.com:443 "POST /v1/tropical_transits/daily?header=Conte
 * add eclipse
 * plot things with numpy, etc.
 * fix readme with examples
+* create an api
+* add support to other aspects
 

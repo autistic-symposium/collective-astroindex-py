@@ -44,45 +44,61 @@ houses_by_sign:
 # TODO: fix this https://astrostyle.com/astrology/essential-dignities/, 
 # https://en.wikipedia.org/wiki/Exaltation_(astrology)
 planets_exaltation:
-  - 'sun': ['aries', 'leo']
-  - 'moon': ['taurus', 'cancer']
-  - 'mercury': ['virgo', 'gemini']
-  - 'venus': ['libra', 'taurus', 'pisces']
-  - 'mars': ['capricorn', 'scorpio', 'aries']
-  - 'jupiter': ['pisces', 'sagittarius']
-  - 'saturn': ['aquarius', 'capricorn', 'libra']
-  - 'uranus': ['aquarius', 'scorpio']
-  - 'neptune': ['pisces', 'leo']
-  - 'pluto': ['scorpio', 'aries']
+  'sun': ['aries', 'leo']
+  'moon': ['taurus', 'cancer']
+  'mercury': ['virgo', 'gemini']
+  'venus': ['libra', 'taurus', 'pisces']
+  'mars': ['capricorn', 'scorpio', 'aries']
+  'jupiter': ['pisces', 'sagittarius']
+  'saturn': ['aquarius', 'capricorn', 'libra']
+  'uranus': ['aquarius', 'scorpio']
+  'neptune': ['pisces', 'leo']
+  'pluto': ['scorpio', 'aries']
 
 planets_detriment:
-  - 'sun': ['aquarius', 'libra']
-  - 'moon': ['scorpio', 'capricorn']
-  - 'mercury': ['pisces', 'sagittarius']
-  - 'venus': ['virgo', 'scorpio', 'aries']
-  - 'mars': ['cancer', 'taurus', 'libra']
-  - 'jupiter': ['gemini', 'virgo']
-  - 'saturn': ['cancer', 'aries']
-  - 'uranus': ['leo']
-  - 'neptune': ['virgo']
-  - 'pluto': ['taurus', 'libra', 'leo']
+  'sun': ['aquarius', 'libra']
+  'moon': ['scorpio', 'capricorn']
+  'mercury': ['pisces', 'sagittarius']
+  'venus': ['virgo', 'scorpio', 'aries']
+  'mars': ['cancer', 'taurus', 'libra']
+  'jupiter': ['gemini', 'virgo']
+  'saturn': ['cancer', 'aries']
+  'uranus': ['leo']
+  'neptune': ['virgo']
+  'pluto': ['taurus', 'libra', 'leo']
 
 # TODO: fix this https://en.wikipedia.org/wiki/Exaltation_(astrology)
 angles_exaltation:
-  - 'sun': [19, 10]
-  - 'moon': 3
-  - 'mercury': 15
-  - 'venus': 27
-  - 'mars': 28
-  - 'jupiter': [5, 15]
-  - 'saturn': [21, 20]
-  - 'nnode': 3
+  'sun': [19, 10]
+  'moon': 3
+  'mercury': 15
+  'venus': 27
+  'mars': 28
+  'jupiter': [5, 15]
+  'saturn': [21, 20]
+  'nnode': 3
 
 angles_detriment:
-  - 'sun': [19, 10]
-  - 'moon': 3
-  - 'mercury': 15
-  - 'venus': 27
-  - 'mars': 28
-  - 'jupiter': [5, 15]
-  - 'saturn': [21, 20]
+  'sun': [19, 10]
+  'moon': 3
+  'mercury': 15
+  'venus': 27
+  'mars': 28
+  'jupiter': [5, 15]
+  'saturn': [21, 20]
+
+# TODO: add support to other aspects
+angles_aspects:
+  'conjunction': 0
+  'opposition': 180
+  'trine': 120
+  'square': 90
+  'sextile': 60
+
+angle_aspects_ranking:
+  'conjunction': 10
+  'opposition': -8
+  'trine': 5
+  'square': -5
+  'sextile': 5
+

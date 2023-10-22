@@ -5,6 +5,7 @@
 import argparse
 
 from src.utils.os import load_config
+from src.utils.plot import plot_collective
 from src.intel.collective import Collective
 
 
@@ -31,6 +32,7 @@ def run() -> None:
     if args.collective_monthly:
         c = Collective(env_vars)
         c.get_collective_forecast_monthly()
+        plot_collective(c.transit_monthly_index, "Collective Transit Index")
 
     else:
         parser.print_help()

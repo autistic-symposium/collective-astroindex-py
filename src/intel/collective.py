@@ -21,8 +21,13 @@ class Collective:
         #TODO: move this to yaml
         self.transit_now = {t: [] for t in ['conjunction', 'trine', 'square', 'opposition', 'sextile']}
         self.transit_monthly = {}
+        self.transit_monthly_index = {}
 
         self.ranking = self._get_ranking_scale()
+
+        self.collective_intel = os.load_yaml(self.env_vars['STRATEGIES_COLLECTIVE'])
+        self.general_intel = os.load_yaml(self.env_vars['STRATEGIES_GENERAL'])
+
 
     #############################
     #       Private methods
@@ -89,8 +94,8 @@ class Collective:
         ### Divide and save the data
         period = [data['month_start_date'], data['month_end_date']]
         # the moon api and retrograde api doesn't seen to be working
-        #moon_phase = data['moon_phase']
-        #retrogrades = data['retrogrades']
+        moon_phase = data['moon_phase']
+        retrogrades = data['retrogrades']
         transit_relation = data['transit_relation']
 
         ### Get transits
@@ -109,6 +114,7 @@ class Collective:
                 self.transit_monthly[date].append((planet1, planet2, transit_type, orb))
         
         ### Get moon phases
+        # TODO: this has no data
         for m in moon_phase:
             date, time = m['date'].split('T')
             self.moon_phase[date] = (m['phase'].lower(), time, m['sign'].lower())
@@ -117,22 +123,41 @@ class Collective:
         os.log_info(f'Moon phases: {self.moon_phase}')
         os.log_info(f'Transits monthly: {self.transit_monthly}')
 
+        # TODO: why I am getting old dates? remove them
+
+    
+    def _create_index_transits_monthly(self) -> dict:
+        """Create index from transits monthly."""
+        angle_aspects_ranking = self.general_intel['angle_aspects_ranking']
+
+        # create a new (temporal) sorted structure for dates vs. indexes
+        # date and data has the following format:
+        # '1-10-2023': [('moon', 'uranus', 'trine', 3.79), ('moon', 'neptune', 'sextile', 0.47)]
+        for date, data in self.transit_monthly.items():
+            
+            self.transit_monthly_index[date] = 0
+
+            for t in data:
+                planet1, planet2, transit_type, orb = t
+                if planet1 == planet2:
+                    continue
+
+                index_here = float(angle_aspects_ranking[transit_type]) * (10 - float(orb)) / 10
+                self.transit_monthly_index[date] += index_here
 
 
     def _create_index_transits_daily(self) -> int:
         """Create index from transits daily."""
         
         index = 0
-        collective_intel = os.load_yaml(self.env_vars['STRATEGIES_COLLECTIVE'])
-        general_intel = os.load_yaml(self.env_vars['STRATEGIES_GENERAL'])
-
+    
         ##################################
         ### Look at super bullish transits
         ##################################
 
-        super_bullish_planets = collective_intel['super_bullish_planets']
-        investing_houses = collective_intel['investing_houses']
-        planets_exaltation = general_intel['planets_exaltation']
+        super_bullish_planets = self.collective_intel['super_bullish_planets']
+        investing_houses = self.collective_intel['investing_houses']
+        planets_exaltation = self.general_intel['planets_exaltation']
 
         for planet in super_bullish_planets:
             
@@ -154,7 +179,7 @@ class Collective:
         ### Look at bullish transits
         ##################################
 
-        bullish_planets = collective_intel['bullish_planets']
+        bullish_planets = self.collective_intel['bullish_planets']
         
         for planet in bullish_planets:
             
@@ -178,8 +203,8 @@ class Collective:
         ##################################
         ### Look at bearish transits
         ##################################
-        bearish_planets = collective_intel['super_bearish_planets']
-        bearish_houses = collective_intel['other_houses']
+        bearish_planets = self.collective_intel['super_bearish_planets']
+        bearish_houses = self.collective_intel['other_houses']
         
         for planet in bearish_planets:
             
@@ -216,6 +241,7 @@ class Collective:
     def get_collective_forecast_today(self) -> None:
         """Get collective forecast now."""
 
+        os.log_info(f'Getting collective forecast today...')
         data = self._request_transits_daily()
         self._parse_data_transits_daily(data)
         
@@ -229,12 +255,9 @@ class Collective:
     def get_collective_forecast_monthly(self) -> None:
         """Get collective forecast monthly."""
 
+        os.log_info(f'Getting collective forecast monthly...')
         data = self._request_transits_monthly()
         self._parse_data_transits_monthly(data)
         
-        # save by events
-        #this_index = self._create_index_transits_monthly()
-        #key = net.get_date_from_timezone(self.timespace['tzone_name']).strftime("%Y-%m-%d_%H-%M-%S")
-        
-        #self.collective_index[key] = this_index
-        #os.log_info(f'Monthly indexes: {this_index}')
+        self._create_index_transits_monthly()
+        os.log_debug(f'Monthly indexes: {self.transit_monthly_index}')
