@@ -16,6 +16,10 @@ def run_menu() -> argparse.ArgumentParser:
                         help='Forecast for the collective today.')
     parser.add_argument('-cm', dest='collective_monthly', action='store_true',
                         help='Forecast for the collective this month.')
+    parser.add_argument('-cc', dest='collective_custom', action='store_true',
+                        help='Forecast for the collective in a custom date range.')
+    parser.add_argument('-c', dest='collective', action='store_true',
+                        help='Forecast for the collective (all intel).')
     return parser
 
 def run() -> None:
@@ -23,17 +27,34 @@ def run() -> None:
     env_vars = load_config()
     parser = run_menu()
     args = parser.parse_args()
+    PRINT_PLOT = False
 
     # TODO: Add argument for city and country
     if args.collective_today:
         c = Collective(env_vars)
         c.get_collective_forecast_today()
 
-    if args.collective_monthly:
+    elif args.collective_monthly:
         c = Collective(env_vars)
         c.get_collective_forecast_monthly()
-        plot_collective(c.transit_monthly_index, "Collective Transit Index")
-
+        # TODO: remove plot from here, add option to save/name
+        if PRINT_PLOT:
+            plot_collective(c.transit_index, "Collective Transit Index (monthly))")
+    
+    elif args.collective_custom:
+        c = Collective(env_vars)
+        c.get_collective_forecast_custom()
+        # TODO: remove plot from here, add option to save/name
+        if PRINT_PLOT:
+            plot_collective(c.transit_index, "Collective Transit Index (daily))")
+    
+    elif args.collective:
+        c = Collective(env_vars)
+        c.get_collective_forecast_today()
+        c.get_collective_forecast_monthly()
+        c.get_collective_forecast_custom()
+        plot_collective(c.transit_index, "Collective Transit Index (all intel))")
+        
     else:
         parser.print_help()
 

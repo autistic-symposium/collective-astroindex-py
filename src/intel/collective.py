@@ -1,6 +1,8 @@
 # -*- encoding: utf-8 -*-
 # src/intel/collective.py
 
+from datetime import timedelta, date, datetime
+
 import src.utils.os as os
 import src.utils.net as net
 
@@ -8,6 +10,7 @@ import src.utils.net as net
 class Collective:
 
     def __init__(self, env_vars, city=None, country=None):
+
         self.env_vars = env_vars
         self.collective_index = {}
         self.location = (city, country)
@@ -21,17 +24,18 @@ class Collective:
         #TODO: move this to yaml
         self.transit_now = {t: [] for t in ['conjunction', 'trine', 'square', 'opposition', 'sextile']}
         self.transit_monthly = {}
-        self.transit_monthly_index = {}
+        self.transit_now_custom = {}
 
+        self.transit_index = {}
         self.ranking = self._get_ranking_scale()
 
         self.collective_intel = os.load_yaml(self.env_vars['STRATEGIES_COLLECTIVE'])
         self.general_intel = os.load_yaml(self.env_vars['STRATEGIES_GENERAL'])
 
 
-    #############################
-    #       Private methods
-    #############################
+    ####################################################
+    #   Private methods for requesting from astro API
+    ####################################################
     def _get_ranking_scale(self) -> dict:
         """Get ranking scale."""
     
@@ -50,9 +54,20 @@ class Collective:
 
         endpoint = 'tropical_transits/monthly'
         return net.craft_request(self.env_vars, endpoint, self.timespace)
-        
 
-    def _parse_data_transits_daily(self, data: dict) -> int:
+
+    def _request_transits_custom_daily(self) -> dict:
+        """Request custom transits daily from API."""
+
+        endpoint = 'natal_transits/daily'
+        return net.craft_request(self.env_vars, endpoint, self.timespace)
+
+
+    ##################################################
+    #   Private methods for parsing the response data
+    ##################################################
+
+    def _parse_data_transits_daily(self, data: dict) -> None:
         """Parse data from transits daily."""
 
         ### Divide and save the data
@@ -88,10 +103,11 @@ class Collective:
             self.transit_now[transit_type].append((planet1, planet2, orb))
 
 
-    def _parse_data_transits_monthly(self, data: dict) -> int:
+    def _parse_data_transits_monthly(self, data: dict) -> None:
         """Parse data from transits monthly."""
 
         ### Divide and save the data
+        # TODO: period is not used
         period = [data['month_start_date'], data['month_end_date']]
         # the moon api and retrograde api doesn't seen to be working
         moon_phase = data['moon_phase']
@@ -120,40 +136,75 @@ class Collective:
             self.moon_phase[date] = (m['phase'].lower(), time, m['sign'].lower())
 
         ### Print the data
-        os.log_info(f'Moon phases: {self.moon_phase}')
-        os.log_info(f'Transits monthly: {self.transit_monthly}')
+        os.log_debug(f'Moon phases: {self.moon_phase}')
+        os.log_debug(f'Transits monthly: {self.transit_monthly}')
 
         # TODO: why I am getting old dates? remove them
 
-    
-    def _create_index_transits_monthly(self) -> dict:
-        """Create index from transits monthly."""
-        angle_aspects_ranking = self.general_intel['angle_aspects_ranking']
 
-        # create a new (temporal) sorted structure for dates vs. indexes
-        # date and data has the following format:
-        # '1-10-2023': [('moon', 'uranus', 'trine', 3.79), ('moon', 'neptune', 'sextile', 0.47)]
-        for date, data in self.transit_monthly.items():
-            
-            self.transit_monthly_index[date] = 0
+    def _parse_data_transits_daily_custom(self, data: dict) -> None:
+        """Parse data from custom transits daily."""
 
-            for t in data:
-                planet1, planet2, transit_type, orb = t
-                if planet1 == planet2:
-                    continue
+        ### Divide and save the data
+        self.ascendant_now = data['ascendant'].lower()
+        transit_date = data['transit_date']
+        transit_relation = data['transit_relation']
+        os.log_debug(f'Ascendant now: {self.ascendant_now}')
 
-                index_here = float(angle_aspects_ranking[transit_type]) * (10 - float(orb)) / 10
-                self.transit_monthly_index[date] += index_here
+        ### Get transits
+        for t in transit_relation:
+            planet1 = t['natal_planet'].lower()
+            planet2 = t['transit_planet'].lower()
+            transit_type = t['aspect_type'].lower()
+            this_date = t['exact_time'].split(' ')
+            is_retrograde = t['is_retrograde']
+            transit_sign = t['transit_sign'].lower()
+            house = t['natal_house']
 
+            if planet1 == planet2:
+                continue
+
+            # Sometimes exact time is '_'
+            if len(this_date) == 1:
+                start_dt, start_time = t['start_time'].split(' ')
+                end_dt, end_time = t['end_time'].split(' ')
+
+                start_y, start_m, start_d = start_dt.split('-')
+                end_y, end_m, end_d = end_dt.split('-')
+
+                start_dt = date(int(start_y), int(start_m), int(start_d))
+                end_dt = date(int(end_y), int(end_m), int(end_d))
+
+                def daterange(date1, date2):
+                    for n in range(int((date2 - date1).days) + 1):
+                        yield date1 + timedelta(n)
+
+                for dt in daterange(start_dt, end_dt):
+                    # TODO: fix this
+                    this_date = dt.strftime("%Y-%m-%d")
+                    this_date = datetime.strptime(this_date, '%Y-%m-%d').strftime('%d-%m-%Y')
+
+            else:
+                this_date = datetime.strptime(this_date[0], '%Y-%m-%d').strftime('%d-%m-%Y')
+           
+            # TODO: add time
+            this_value = (planet1, planet2, transit_type, is_retrograde, transit_sign, house)
+            if self.transit_now_custom.get(this_date):
+                self.transit_now_custom[this_date].append(this_value)
+            else:
+                self.transit_now_custom[this_date] = [this_value]
+
+
+    ####################################################
+    #    Private methods for creating the index
+    ####################################################
 
     def _create_index_transits_daily(self) -> int:
         """Create index from transits daily."""
         
         index = 0
     
-        ##################################
         ### Look at super bullish transits
-        ##################################
 
         super_bullish_planets = self.collective_intel['super_bullish_planets']
         investing_houses = self.collective_intel['investing_houses']
@@ -174,10 +225,7 @@ class Collective:
                     os.log_debug(f'{planet} is in house {house}')
                     index += float(self.ranking['super_bullish'])
 
-        
-        ##################################
         ### Look at bullish transits
-        ##################################
 
         bullish_planets = self.collective_intel['bullish_planets']
         
@@ -199,10 +247,8 @@ class Collective:
             # TODO: add angles in exaltation
             # TODO: add path of fortune in exaltation
 
-
-        ##################################
         ### Look at bearish transits
-        ##################################
+
         bearish_planets = self.collective_intel['super_bearish_planets']
         bearish_houses = self.collective_intel['other_houses']
         
@@ -228,18 +274,92 @@ class Collective:
 
             # TODO: add angles in detriment
 
-
-        ##################################
         ### Return the index
-        ##################################
         return index
+
+
+    def _create_index_transits_monthly(self) -> dict:
+        """Create index from transits monthly."""
+        angle_aspects_ranking = self.general_intel['angle_aspects_ranking']
+
+        # create a new (temporal) sorted structure for dates vs. indexes
+        # date and data has the following format:
+        # '1-10-2023': [('moon', 'uranus', 'trine', 3.79), ('moon', 'neptune', 'sextile', 0.47)]
+        for date, data in self.transit_monthly.items():
+            
+            self.transit_index[date] = 0
+
+            for t in data:
+                planet1, planet2, transit_type, orb = t
+                if planet1 == planet2:
+                    continue
+
+                index_here = float(angle_aspects_ranking[transit_type]) * (10 - float(orb)) / 10
+                self.transit_index[date] += index_here
+
+    
+    def _create_index_transits_daily_custom(self) -> dict:
+        """Create index from custom transits daily."""
+
+        for date, data in self.transit_now_custom.items():
+            
+            self.transit_index[date] = 0
+            planets_exaltation = self.general_intel['planets_exaltation']
+            planets_detriment = self.general_intel['planets_detriment']
+            investing_houses = self.collective_intel['investing_houses']
+
+            for t in data:
+                planet1, planet2, transit_type, is_retrograde, sign, house = t
+                if planet1 == planet2:
+                    continue
+                
+                if is_retrograde:
+                    self.transit_index[date] -= float(self.ranking['retrograde'])
+                
+                if sign in planets_exaltation[planet2]:
+                    self.transit_index[date] += float(self.ranking['exalted'])
+                    if house in investing_houses:
+                        self.transit_index[date] += float(self.ranking['super_bullish'])
+                elif sign in planets_detriment[planet2]:
+                    self.transit_index[date] -= float(self.ranking['detriment'])
+                    if house in investing_houses:
+                        self.transit_index[date] -= float(self.ranking['super_bearish'])
+                else:
+                    if house in investing_houses:
+                        self.transit_index[date] += float(self.ranking['bullish'])
+                    else:
+                        self.transit_index[date] -= float(self.ranking['bearish'])
+
 
     #############################
     #       Public methods
     #############################
 
     def get_collective_forecast_today(self) -> None:
-        """Get collective forecast now."""
+        """
+            Get collective forecast now.
+
+            {
+            "transit_date": "17-6-2017",
+            "ascendant": "Leo",
+            "transit_house": [
+                {
+                    "planet": "Sun",
+                    "natal_sign": "Taurus",
+                    "transit_house": 11,
+                    "is_retrograde": false
+                },],
+            "transit_relation": [
+                {
+                    "transit_planet": "Sun",
+                    "natal_planet": "Jupiter",
+                    "type": "Sextile",
+                    "orb": 0.66
+                },],
+                "retrogrades": [],
+                "moon_phase": null
+            }
+        """
 
         os.log_info(f'Getting collective forecast today...')
         data = self._request_transits_daily()
@@ -249,15 +369,72 @@ class Collective:
         key = net.get_date_from_timezone(self.timespace['tzone_name']).strftime("%Y-%m-%d_%H-%M-%S")
 
         self.collective_index[key] = this_index
-        os.log_info(f'Current Index ({key}): {this_index}')
+        os.log_info(f'Daily Index ({key}): {this_index}')
 
 
     def get_collective_forecast_monthly(self) -> None:
-        """Get collective forecast monthly."""
+        """
+            Get collective forecast monthly.
+
+            {
+                "month_start_date": "1-6-2017",
+                "month_end_date": "30-6-2017",
+                "ascendant": "Leo",
+                "transit_relation": [
+                    {
+                        "transit_planet": "Mars",
+                        "natal_planet": "Moon",
+                        "type": "Trine",
+                        "orb": 3.84,
+                        "date": "1-6-2017"
+                    },],
+                "retrogrades": [],
+                "moon_phase": [
+                    {
+                        "phase_type": "Full Moon",
+                        "date": "2017-06-09T13:11:00.000Z",
+                        "sign": "Sagittarius",
+                        "house": 5
+                    },]}
+        """
 
         os.log_info(f'Getting collective forecast monthly...')
         data = self._request_transits_monthly()
         self._parse_data_transits_monthly(data)
         
         self._create_index_transits_monthly()
-        os.log_debug(f'Monthly indexes: {self.transit_monthly_index}')
+        os.log_info(f'Monthly indexes: {self.transit_index}')
+
+
+    def get_collective_forecast_custom(self) -> None:
+        """ 
+            Get collective custom forecast daily.
+
+            {
+            "transit_date": "1-25-2023",
+            "ascendant": "Sagittarius",
+            "transit_relation": [
+                {
+                    "transit_planet": "Sun",
+                    "natal_planet": "Mercury",
+                    "aspect_type": "Conjunction",
+                    "start_time": "2023-01-23 05:57:47",
+                    "exact_time": "2023-01-25 05:08:14",
+                    "end_time": "2023-01-27 04:20:14",
+                    "is_retrograde": false,
+                    "transit_sign": "Aquarius",
+                    "natal_house": 3,
+                    "planet_in_signs": [
+                        "Saturn"
+                    ]
+                },
+                {
+        """
+
+        os.log_info(f'Getting collective custom forecast daily...')
+        data = self._request_transits_custom_daily()
+        
+        self._parse_data_transits_daily_custom(data)
+        
+        self._create_index_transits_daily_custom()
+        os.log_info(f'Daily custom indexes: {self.transit_index}')

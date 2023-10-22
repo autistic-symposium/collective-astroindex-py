@@ -3,6 +3,7 @@
 
 import matplotlib.pyplot as plt
 import numpy as np
+from datetime import datetime
 
 
 FONT = {
@@ -20,7 +21,8 @@ def plot_collective(data: dict, title):
     plt.xlabel('Date', fontdict=FONT)
     plt.ylabel('Index', fontdict=FONT)
 
-    lists = data.items()
-    x, y = zip(*lists) 
+    ordered_data = sorted(data.items(), key = lambda x: datetime.strptime(x[0], '%d-%m-%Y'))
+
+    x, y = zip(*ordered_data) 
     plt.plot(x, y)
     plt.show()

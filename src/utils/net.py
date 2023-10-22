@@ -32,7 +32,7 @@ def get_lat_and_lon_at_given_city(city: str, country: str) -> tuple:
     """Get latitude and longitude from a city and country."""
 
     if not city or not country:
-        os.log_info('No city or country provided. Using current location.')
+        os.log_info('No city or country provided. Using user IP location.')
 
         location = geocoder.ip('me')
     else:
@@ -100,7 +100,7 @@ def get_timespace_dict(day=None, month=None, year=None, hour=None, mins=None, la
         'lat': lat,
         'lon': lon,
         'tzone': tzone,
-        'tzone_name': tzone_name,
+        'tzone_name': tzone_name
     }    
 
     
