@@ -100,6 +100,7 @@ def get_timespace_dict(day=None, month=None, year=None, hour=None, mins=None, la
         'lat': lat,
         'lon': lon,
         'tzone': tzone,
+        'tzone_name': tzone_name,
     }    
 
     

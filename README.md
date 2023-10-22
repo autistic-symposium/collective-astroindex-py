@@ -50,4 +50,14 @@ https://json.astrologyapi.com:443 "POST /v1/tropical_transits/daily?header=Conte
 
 * [move out from setup.py](https://blog.ganssle.io/articles/2021/10/setup-py-deprecated.html), fix makefile, etc.
 * unit tests
+* save date data
+* add path of fortune and others
+* fix general
+* add progressed charts
+* add temporal line for index over time (every 2 hours when the ascendant changes)
+* add eclipse
+* plot things with numpy, etc.
+* fix readme with examples
+* create an api
+* add support to other aspects
 
