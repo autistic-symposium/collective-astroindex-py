@@ -1,6 +1,8 @@
 # -*- encoding: utf-8 -*-
 # src/intel/collective.py
 
+from datetime import timedelta, date, datetime
+
 import src.utils.os as os
 import src.utils.net as net
 
@@ -154,7 +156,7 @@ class Collective:
             planet1 = t['natal_planet'].lower()
             planet2 = t['transit_planet'].lower()
             transit_type = t['aspect_type'].lower()
-            datetime = t['exact_time'].split(' ')
+            this_date = t['exact_time'].split(' ')
             is_retrograde = t['is_retrograde']
             transit_sign = t['transit_sign'].lower()
             house = t['natal_house']
@@ -163,14 +165,34 @@ class Collective:
                 continue
 
             # Sometimes exact time is '_'
-            if len(datetime) == 1:
-                datetime = t['start_time'].split(' ') or t['end_time'].split(' ')
-           
-            this_value = (planet1, planet2, transit_type, datetime[1], is_retrograde, transit_sign, house)
-            if self.transit_now_custom.get(datetime[0]):
-                self.transit_now_custom[datetime[0]].append(this_value)
+            if len(this_date) == 1:
+                start_dt, start_time = t['start_time'].split(' ')
+                end_dt, end_time = t['end_time'].split(' ')
+
+                start_y, start_m, start_d = start_dt.split('-')
+                end_y, end_m, end_d = end_dt.split('-')
+
+                start_dt = date(int(start_y), int(start_m), int(start_d))
+                end_dt = date(int(end_y), int(end_m), int(end_d))
+
+                def daterange(date1, date2):
+                    for n in range(int((date2 - date1).days) + 1):
+                        yield date1 + timedelta(n)
+
+                for dt in daterange(start_dt, end_dt):
+                    # TODO: fix this
+                    this_date = dt.strftime("%Y-%m-%d")
+                    this_date = datetime.strptime(this_date, '%Y-%m-%d').strftime('%d-%m-%Y')
+
             else:
-                self.transit_now_custom[datetime[0]] = [this_value]
+                this_date = datetime.strptime(this_date[0], '%Y-%m-%d').strftime('%d-%m-%Y')
+           
+            # TODO: add time
+            this_value = (planet1, planet2, transit_type, is_retrograde, transit_sign, house)
+            if self.transit_now_custom.get(this_date):
+                self.transit_now_custom[this_date].append(this_value)
+            else:
+                self.transit_now_custom[this_date] = [this_value]
 
 
     ####################################################
@@ -287,7 +309,7 @@ class Collective:
             investing_houses = self.collective_intel['investing_houses']
 
             for t in data:
-                planet1, planet2, transit_type, time, is_retrograde, sign, house = t
+                planet1, planet2, transit_type, is_retrograde, sign, house = t
                 if planet1 == planet2:
                     continue
                 

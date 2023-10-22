@@ -18,6 +18,8 @@ def run_menu() -> argparse.ArgumentParser:
                         help='Forecast for the collective this month.')
     parser.add_argument('-cc', dest='collective_custom', action='store_true',
                         help='Forecast for the collective in a custom date range.')
+    parser.add_argument('-c', dest='collective', action='store_true',
+                        help='Forecast for the collective (all intel).')
     return parser
 
 def run() -> None:
@@ -45,6 +47,13 @@ def run() -> None:
         # TODO: remove plot from here, add option to save/name
         if PRINT_PLOT:
             plot_collective(c.transit_index, "Collective Transit Index (daily))")
+    
+    elif args.collective:
+        c = Collective(env_vars)
+        c.get_collective_forecast_today()
+        c.get_collective_forecast_monthly()
+        c.get_collective_forecast_custom()
+        plot_collective(c.transit_index, "Collective Transit Index (all intel))")
         
     else:
         parser.print_help()
