@@ -2,6 +2,9 @@
 
 <br>
 
+TODO: clean up this README
+
+<br>
 
 ## install
 
