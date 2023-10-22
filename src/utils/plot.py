@@ -20,7 +20,7 @@ def plot_collective(data: dict, title):
     plt.xlabel('Date', fontdict=FONT)
     plt.ylabel('Index', fontdict=FONT)
 
-    lists = sorted(data.items())
+    lists = data.items()
     x, y = zip(*lists) 
     plt.plot(x, y)
     plt.show()
