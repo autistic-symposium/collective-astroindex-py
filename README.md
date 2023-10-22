@@ -41,6 +41,15 @@ https://json.astrologyapi.com:443 "POST /v1/tropical_transits/daily?header=Conte
 ```
 
 
+<p align="center">
+<img src="https://github.com/choices-game/astroindex-py/blob/main/docs/collective_transit_index_october_2023.png" width="80%" align="center" style="padding:1px;border:1px solid black;"/>
+</p>
+
+
+
+
+
+
 <br>
 
 
