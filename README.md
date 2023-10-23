@@ -78,6 +78,7 @@ https://json.astrologyapi.com:443 "POST /v1/tropical_transits/daily?header=Conte
 * add support to other aspects
 * add linter
 * backtest results on real data
+* add retrogrades and shadows
 * forecast with moon
 * do natal chart
     - do natal_transits daily and weekly
@@ -90,7 +91,9 @@ https://json.astrologyapi.com:443 "POST /v1/tropical_transits/daily?header=Conte
     - https://www.worldweatheronline.com/weather-api/api/astronomy-api.aspx
     - https://www.aerisweather.com/support/docs/api/reference/endpoints/sunmoon-moonphases/
     - https://www.meteomatics.com/en/api/available-parameters/moon/#moon_phase
-
+* set postman
+* check
+    https://www.astrolog.org/ftp/astrolog.htm, https://github.com/CruiserOne/Astrolog
 
 
 
