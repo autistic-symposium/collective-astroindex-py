@@ -28,6 +28,10 @@ def run_menu() -> argparse.ArgumentParser:
                         help='Wheel forecast.')
     parser.add_argument('-cd', dest='chart_data', action='store_true',
                         help='Chart data.') 
+    parser.add_argument('-ws', dest='whole_sign', action='store_true',
+                        help='Whole sign houses.')
+    parser.add_argument('-n', dest='natal', action='store_true',
+                        help='Natal chart.')
     return parser
 
 def run() -> None:
@@ -74,6 +78,7 @@ def run() -> None:
         c.get_collective_forecast_moon()
         # TODO: how is this being added/used?
         c.get_transit_forecast()
+        # TODO: add whole sign houses
         plot_collective(c.transit_index, "Collective Transit Index (all intel))")
         
     elif args.wheel:
@@ -83,6 +88,15 @@ def run() -> None:
     elif args.chart_data:
         c = Collective(env_vars)
         c.get_chart_data()
+    
+    elif args.whole_sign:
+        c = Collective(env_vars)
+        c.get_whole_sign_houses()
+    
+    elif args.natal:
+        # TODO: this does not work
+        c = Collective(env_vars)
+        c.get_natal_chart()
 
     else:
         parser.print_help()

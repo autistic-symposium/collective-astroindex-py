@@ -103,6 +103,9 @@ https://json.astrologyapi.com:443 "POST /v1/tropical_transits/daily?header=Conte
 * at some point we can build our own api, so we don't need to rely on an external api
 * rename collective to "astrology api" or something, and remove intel from it
 * normalize the data
+* check enigma https://radixpro.com/enigma/ 
+* check https://mirror.xyz/polymarket.eth 
+* check https://uma.xyz/#osnap 
 
 
 
