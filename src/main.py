@@ -22,7 +22,7 @@ def run_menu() -> argparse.ArgumentParser:
                         help='Moon phase.')
     parser.add_argument('-c', dest='collective', action='store_true',
                         help='Forecast for the collective (all intel).')
-    parser.add_argument('-t, --transit', dest='transit', action='store_true',
+    parser.add_argument('-t', dest='transit', action='store_true',
                         help='Transit forecast.')
     return parser
 

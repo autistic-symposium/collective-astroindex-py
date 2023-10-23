@@ -94,7 +94,11 @@ https://json.astrologyapi.com:443 "POST /v1/tropical_transits/daily?header=Conte
 * set postman
 * check
     https://www.astrolog.org/ftp/astrolog.htm, https://github.com/CruiserOne/Astrolog
-
+* understand tripicities
+    - https://www.skyscript.co.uk/triplicities.html
+* check intel
+    - https://skyscript.co.uk/wealthelect.html
+* taurus moon is exalted at 3 degrees
 
 
 

@@ -26,6 +26,7 @@ class Collective:
         self.transit_monthly = {}
         self.transit_now_custom = {}
         self.transit_moon = {}
+        self.transit_forecast = {}
 
         self.transit_index = {}
         self.ranking = self._get_ranking_scale()
@@ -70,6 +71,13 @@ class Collective:
         """Request moon phase from API."""
 
         endpoint = 'moon_phase_report'
+        return net.craft_request(self.env_vars, endpoint, self.timespace)
+
+    
+    def _request_transits_forecast(self) -> dict:
+        """Request transits forecast from API."""
+
+        endpoint = 'planets/tropical'
         return net.craft_request(self.env_vars, endpoint, self.timespace)
 
 
@@ -214,6 +222,24 @@ class Collective:
         print(f'Moon phase: {self.moon_phase}')
         print(f'Significance: {significance}')
 
+
+    def _parse_data_transits_forecast(self, data: dict) -> None:
+        """ Parse data from transit forecast."""
+
+        for obj in data:
+            planet = obj['name'].lower()
+            full_degree = obj['fullDegree']
+            norm_degree = obj['normDegree']
+            speed = obj['speed']
+            is_retrograde = obj['isRetro']
+            sign = obj['sign'].lower()
+            house = obj['house']
+            
+            if planet == 'Ascendant':
+                self.ascendant_now = sign
+            
+            self.transit_forecast[planet] = [full_degree, norm_degree, speed, is_retrograde, sign, house]
+            
 
     ####################################################
     #    Private methods for creating the index
@@ -369,6 +395,33 @@ class Collective:
         return this_index
 
 
+    def _create_index_transits_forecast(self) -> dict:
+        """Create index from transit forecast."""
+
+        this_index = 0
+        super_bullish_planets = self.collective_intel['super_bullish_planets']
+        investing_houses = self.collective_intel['investing_houses']
+        planets_exaltation = self.general_intel['planets_exaltation']
+    
+        for planet, data in self.transit_forecast.items():
+            full_degree, norm_degree, speed, is_retrograde, sign, house = data
+
+            if planet in planets_exaltation:
+                this_index += float(self.ranking['exalted'])
+            
+            if planet in self.retrogrades_now:
+                this_index -= float(self.ranking['retrograde'])
+            
+            if house in investing_houses:
+                this_index += float(self.ranking['super_bullish'])
+            
+            if planet in super_bullish_planets:
+                this_index += float(self.ranking['super_bullish'])
+            
+        
+        return this_index
+
+
     #############################
     #       Public methods
     #############################
@@ -499,3 +552,16 @@ class Collective:
         this_index = self._create_index_transits_moon()
         os.log_info(f'Moon phases: {self.moon_phase}')
         os.log_info(f'Moon index: {this_index}')
+
+    
+    def get_transit_forecast(self) -> None:
+        """Get transit forecast."""
+
+        os.log_info(f'Getting transit forecast...')
+        data = self._request_transits_forecast()
+
+        self._parse_data_transits_forecast(data)
+
+        this_index = self._create_index_transits_forecast()
+        os.log_info(f'Transit index: {this_index}')
+        
