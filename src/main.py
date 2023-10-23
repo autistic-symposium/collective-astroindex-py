@@ -24,6 +24,8 @@ def run_menu() -> argparse.ArgumentParser:
                         help='Forecast for the collective (all intel).')
     parser.add_argument('-t', dest='transit', action='store_true',
                         help='Transit forecast.')
+    parser.add_argument('-w', dest='wheel', action='store_true',
+                        help='Wheel forecast.')
     return parser
 
 def run() -> None:
@@ -70,6 +72,10 @@ def run() -> None:
         c.get_collective_forecast_moon()
         plot_collective(c.transit_index, "Collective Transit Index (all intel))")
         
+    elif args.wheel:
+        c = Collective(env_vars)
+        c.get_wheel()
+
     else:
         parser.print_help()
 

@@ -80,6 +80,21 @@ class Collective:
         endpoint = 'planets/tropical'
         return net.craft_request(self.env_vars, endpoint, self.timespace)
 
+    
+    def _request_wheel(self) -> dict:
+        """Request wheel from API."""
+
+        endpoint = 'natal_wheel_chart'
+        custom_data = {
+            'planet_icon_color': '#F57C00',
+            'inner_circle_background': '#FFF8E1',
+            'sign_icon_color': 'red',
+            'sign_background': '#ffffff',
+            'chart_size': '500',
+            'image_type': 'png',
+        }
+        return net.craft_request(self.env_vars, endpoint, self.timespace, custom_data)
+
 
     ##################################################
     #   Private methods for parsing the response data
@@ -240,6 +255,14 @@ class Collective:
             
             self.transit_forecast[planet] = [full_degree, norm_degree, speed, is_retrograde, sign, house]
             
+
+    def _parse_data_wheel(self, data: dict) -> None:
+        """Parse data from wheel."""
+
+        if data['status'] == True:
+            url = data['chart_url']
+            os.log_info(f'Wheel created: {url}')
+
 
     ####################################################
     #    Private methods for creating the index
@@ -555,7 +578,28 @@ class Collective:
 
     
     def get_transit_forecast(self) -> None:
-        """Get transit forecast."""
+        """
+            Get transit forecast.
+
+            [{
+                    "name":"Sun",
+                    "fullDegree":330.41334722167386,
+                    "normDegree":0.4133472216738596,
+                    "speed":1.0082712955819473,
+                    "isRetro":"false",
+                    "sign":"Pisces",
+                    "house":6
+                },
+                {
+                    "name":"Moon",
+                    "fullDegree":114.14261905777207,
+                    "normDegree":24.142619057772066,
+                    "speed":12.96038356718529,
+                    "isRetro":"false",
+                    "sign":"Cancer",
+                    "house":10
+                },
+        """
 
         os.log_info(f'Getting transit forecast...')
         data = self._request_transits_forecast()
@@ -565,3 +609,12 @@ class Collective:
         this_index = self._create_index_transits_forecast()
         os.log_info(f'Transit index: {this_index}')
         
+
+    def get_wheel(self) -> None:
+        """Get wheel forecast."""
+
+        os.log_info(f'Getting wheel...')
+        data = self._request_wheel()
+
+        self._parse_data_wheel(data)
+    
