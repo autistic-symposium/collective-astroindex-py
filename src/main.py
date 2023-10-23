@@ -26,6 +26,8 @@ def run_menu() -> argparse.ArgumentParser:
                         help='Transit forecast.')
     parser.add_argument('-w', dest='wheel', action='store_true',
                         help='Wheel forecast.')
+    parser.add_argument('-cd', dest='chart_data', action='store_true',
+                        help='Chart data.') 
     return parser
 
 def run() -> None:
@@ -70,11 +72,17 @@ def run() -> None:
         c.get_collective_forecast_monthly()
         c.get_collective_forecast_custom()
         c.get_collective_forecast_moon()
+        # TODO: how is this being added/used?
+        c.get_transit_forecast()
         plot_collective(c.transit_index, "Collective Transit Index (all intel))")
         
     elif args.wheel:
         c = Collective(env_vars)
         c.get_wheel()
+
+    elif args.chart_data:
+        c = Collective(env_vars)
+        c.get_chart_data()
 
     else:
         parser.print_help()

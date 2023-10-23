@@ -66,6 +66,46 @@ moon:
       'uranus': unclear
       'neptune': unclear
       'pluto': unclear
+  'semi sextile':
+      'sun': unclear
+      'mercury': unclear
+      'venus': unclear
+      'mars': unclear
+      'jupiter': unclear
+      'saturn': unclear
+      'uranus': unclear
+      'neptune': unclear
+      'pluto': unclear
+  'quintile':
+      'sun': unclear
+      'mercury': unclear
+      'venus': unclear
+      'mars': unclear
+      'jupiter': unclear
+      'saturn': unclear
+      'uranus': unclear
+      'neptune': unclear
+      'pluto': unclear
+    'semi square':
+      'sun': unclear
+      'mercury': unclear
+      'venus': unclear
+      'mars': unclear
+      'jupiter': unclear
+      'saturn': unclear
+      'uranus': unclear
+      'neptune': unclear
+      'pluto': unclear
+    'quincunx':
+      'sun': unclear
+      'mercury': unclear
+      'venus': unclear
+      'mars': unclear
+      'jupiter': unclear
+      'saturn': unclear
+      'uranus': unclear
+      'neptune': unclear
+      'pluto': unclear
 
 sun:
   'conjunction': 
@@ -113,6 +153,43 @@ sun:
     'uranus': unclear
     'neptune': unclear
     'pluto': unclear
+  'semi sextile':
+      'mercury': unclear
+      'venus': unclear
+      'mars': unclear
+      'jupiter': unclear
+      'saturn': unclear
+      'uranus': unclear
+      'neptune': unclear
+      'pluto': unclear
+  'quintile':
+      'mercury': unclear
+      'venus': unclear
+      'mars': unclear
+      'jupiter': unclear
+      'saturn': unclear
+      'uranus': unclear
+      'neptune': unclear
+      'pluto': unclear
+    'semi square':
+      'mercury': unclear
+      'venus': unclear
+      'mars': unclear
+      'jupiter': unclear
+      'saturn': unclear
+      'uranus': unclear
+      'neptune': unclear
+      'pluto': unclear
+    'quincunx':
+      'mercury': unclear
+      'venus': unclear
+      'mars': unclear
+      'jupiter': unclear
+      'saturn': unclear
+      'uranus': unclear
+      'neptune': unclear
+      'pluto': unclear
+
 
 mercury:
   'conjunction':
@@ -155,6 +232,38 @@ mercury:
     'uranus': unclear
     'neptune': unclear
     'pluto': unclear
+  'semi sextile':
+      'venus': unclear
+      'mars': unclear
+      'jupiter': unclear
+      'saturn': unclear
+      'uranus': unclear
+      'neptune': unclear
+      'pluto': unclear
+  'quintile':
+      'venus': unclear
+      'mars': unclear
+      'jupiter': unclear
+      'saturn': unclear
+      'uranus': unclear
+      'neptune': unclear
+      'pluto': unclear
+    'semi square':
+      'venus': unclear
+      'mars': unclear
+      'jupiter': unclear
+      'saturn': unclear
+      'uranus': unclear
+      'neptune': unclear
+      'pluto': unclear
+    'quincunx':
+      'venus': unclear
+      'mars': unclear
+      'jupiter': unclear
+      'saturn': unclear
+      'uranus': unclear
+      'neptune': unclear
+      'pluto': unclear
 
 venus:
   'conjunction':
@@ -192,7 +301,36 @@ venus:
     'uranus': unclear
     'neptune': unclear
     'pluto': unclear
-  
+  'semi sextile':
+      'mars': unclear
+      'jupiter': unclear
+      'saturn': unclear
+      'uranus': unclear
+      'neptune': unclear
+      'pluto': unclear
+  'quintile':
+      'mars': unclear
+      'jupiter': unclear
+      'saturn': unclear
+      'uranus': unclear
+      'neptune': unclear
+      'pluto': unclear
+    'semi square':
+      'mars': unclear
+      'jupiter': unclear
+      'saturn': unclear
+      'uranus': unclear
+      'neptune': unclear
+      'pluto': unclear
+    'quincunx':
+      'mars': unclear
+      'jupiter': unclear
+      'saturn': unclear
+      'uranus': unclear
+      'neptune': unclear
+      'pluto': unclear
+
+
 mars:
   'conjunction': 
     'jupiter': unclear
@@ -223,7 +361,32 @@ mars:
     'uranus': unclear
     'neptune': unclear
     'pluto': unclear
-  
+  'semi sextile':
+      'jupiter': unclear
+      'saturn': unclear
+      'uranus': unclear
+      'neptune': unclear
+      'pluto': unclear
+  'quintile':
+      'jupiter': unclear
+      'saturn': unclear
+      'uranus': unclear
+      'neptune': unclear
+      'pluto': unclear
+    'semi square':
+      'jupiter': unclear
+      'saturn': unclear
+      'uranus': unclear
+      'neptune': unclear
+      'pluto': unclear
+    'quincunx':
+      'jupiter': unclear
+      'saturn': unclear
+      'uranus': unclear
+      'neptune': unclear
+      'pluto': unclear  
+
+
 jupiter:
  'conjunction':
     'saturn': unclear
@@ -249,13 +412,49 @@ jupiter:
     'saturn': unclear
     'uranus': unclear
     'neptune': unclear
-    'pluto':   unclear
-  
+    'pluto': unclear
+   'semi sextile':
+      'saturn': unclear
+      'uranus': unclear
+      'neptune': unclear
+      'pluto': unclear
+  'quintile':
+      'saturn': unclear
+      'uranus': unclear
+      'neptune': unclear
+      'pluto': unclear
+    'semi square':
+      'saturn': unclear
+      'uranus': unclear
+      'neptune': unclear
+      'pluto': unclear
+    'quincunx':
+      'saturn': unclear
+      'uranus': unclear
+      'neptune': unclear
+      'pluto': unclear 
+
 saturn:
   'conjunction':
     'uranus': unclear
     'neptune': unclear
     'pluto': unclear
+  'semi sextile':
+      'uranus': unclear
+      'neptune': unclear
+      'pluto': unclear
+  'quintile':
+      'uranus': unclear
+      'neptune': unclear
+      'pluto': unclear
+    'semi square':
+      'uranus': unclear
+      'neptune': unclear
+      'pluto': unclear
+    'quincunx':
+      'uranus': unclear
+      'neptune': unclear
+      'pluto': unclear
   'opposition':
     'uranus': unclear
     'neptune': unclear
@@ -289,6 +488,18 @@ uranus:
   'sextile':
     'neptune': unclear
     'pluto': unclear
+  'semi sextile':
+      'neptune': unclear
+      'pluto': unclear
+  'quintile':
+      'neptune': unclear
+      'pluto': unclear
+    'semi square':
+      'neptune': unclear
+      'pluto': unclear
+    'quincunx':
+      'neptune': unclear
+      'pluto': unclear
   
 neptune:
   'conjunction':
@@ -301,3 +512,11 @@ neptune:
     'pluto': unclear
   'sextile':
     'pluto': unclear
+  'semi sextile':
+      'pluto': unclear
+  'quintile':
+      'pluto': unclear
+    'semi square':
+      'pluto': unclear
+    'quincunx':
+      'pluto': unclear

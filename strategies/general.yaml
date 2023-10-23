@@ -101,4 +101,10 @@ angle_aspects_ranking:
   'trine': 5
   'square': -5
   'sextile': 5
+  'quincunx': -3
+  'semi sextile': 3
+  'semi square': -3
+  'quintile': 3
+
+
 

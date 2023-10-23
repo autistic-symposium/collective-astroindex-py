@@ -27,6 +27,7 @@ class Collective:
         self.transit_now_custom = {}
         self.transit_moon = {}
         self.transit_forecast = {}
+        self.chart_data = {'houses': [], 'aspects': []}
 
         self.transit_index = {}
         self.ranking = self._get_ranking_scale()
@@ -94,6 +95,13 @@ class Collective:
             'image_type': 'png',
         }
         return net.craft_request(self.env_vars, endpoint, self.timespace, custom_data)
+
+
+    def _request_chart_data(self) -> dict:
+        """Request chart data from API."""
+
+        endpoint = 'western_chart_data'
+        return net.craft_request(self.env_vars, endpoint, self.timespace)
 
 
     ##################################################
@@ -262,6 +270,33 @@ class Collective:
         if data['status'] == True:
             url = data['chart_url']
             os.log_info(f'Wheel created: {url}')
+
+
+    def _parse_data_chart_data(self, data: dict) -> None:
+        """Parse data from chart data."""
+
+        for key, values in data.items():
+
+            if key == 'houses':
+                for value in values:
+                    start_degree = value['start_degree']
+                    end_degree = value['end_degree']
+                    sign = value['sign'].lower()
+                    house = value['house_id']
+                    planets = value['planets']
+
+                    self.chart_data['houses'].append((start_degree, end_degree, sign, house, planets))
+            
+            elif key == 'aspects':
+                for value in values:
+                    aspected_planet = value['aspected_planet'].lower()
+                    aspecting_planet = value['aspecting_planet'].lower()
+                    aspect = value['type'].lower()
+                    orb = value['orb']
+                    diff = value['diff']
+
+                    self.chart_data['aspects'].append((aspected_planet, aspecting_planet, aspect, orb, diff))
+
 
 
     ####################################################
@@ -445,6 +480,31 @@ class Collective:
         return this_index
 
 
+    def _create_index_chart_data(self) -> dict:
+        """Create index from chart data."""
+
+        this_index = 0
+        houses_ranking = self.collective_intel['investing_houses']
+        aspects_ranking = self.general_intel['angle_aspects_ranking']
+        ranking = self.ranking
+
+        for house in self.chart_data['houses']:
+            start_degree, end_degree, sign, house, planets = house
+            if house in houses_ranking:
+                this_index += float(ranking['super_bullish'])
+        
+        for aspect in self.chart_data['aspects']:
+            aspected_planet, aspecting_planet, aspect, orb, diff = aspect
+            # the api has a typo 'semi sqaure'
+            if aspect in aspects_ranking:
+                this_index += float(aspects_ranking[aspect])
+            else:
+                os.log_debug(f'Aspect {aspect} not found in aspects_ranking')
+
+        return this_index
+
+
+
     #############################
     #       Public methods
     #############################
@@ -618,3 +678,38 @@ class Collective:
 
         self._parse_data_wheel(data)
     
+
+    def get_chart_data(self) -> None:
+        """
+            Get chart data.
+            This endpoint brings more aspects (e.g., quintile, semisextile).
+
+            {
+            "houses": [
+                {
+                    "start_degree": 138.21238,
+                    "end_degree": 165.28495,
+                    "sign": "Leo",
+                    "house_id": 1,
+                    "planets": []
+                },
+            "aspects": [
+                {
+                    "aspecting_planet": "Sun",
+                    "aspected_planet": "Moon",
+                    "aspecting_planet_id": 0,
+                    "aspected_planet_id": 1,
+                    "type": "Quincunx",
+                    "orb": 0.22,
+                    "diff": 149.78
+                },
+        
+        """
+
+        os.log_info(f'Getting chart data...')
+        data = self._request_chart_data()
+
+        self._parse_data_chart_data(data)
+
+        this_index = self._create_index_chart_data()
+        os.log_info(f'Chart data index: {this_index}')

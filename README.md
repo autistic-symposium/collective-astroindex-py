@@ -99,6 +99,10 @@ https://json.astrologyapi.com:443 "POST /v1/tropical_transits/daily?header=Conte
 * check intel
     - https://skyscript.co.uk/wealthelect.html
 * taurus moon is exalted at 3 degrees
+* moon void of course
+* at some point we can build our own api, so we don't need to rely on an external api
+* rename collective to "astrology api" or something, and remove intel from it
+* normalize the data
 
 
 
