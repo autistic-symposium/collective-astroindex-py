@@ -7,6 +7,7 @@ import requests
 from dateutil import tz
 from datetime import datetime
 from timezonefinder import TimezoneFinder
+from urllib.parse import urljoin
 
 import src.utils.os as os
 
@@ -74,7 +75,10 @@ def get_datetime_now_at_given_timezone(tzone_name=None) -> dict:
     return now.day, now.month, now.year, now.hour, now.minute
 
 
+def compose_url(url, endpoint) -> str:
+    """Compose url from base and endpoint."""
 
+    return urljoin(url, endpoint)
 
     
 

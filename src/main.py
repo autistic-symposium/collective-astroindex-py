@@ -44,8 +44,7 @@ def run() -> None:
 
     # TODO: Add argument for city and country
     if args.collective_today:
-        
-        c.get_collective_forecast_today()
+        c.get_transits_daily()
 
     elif args.collective_monthly:
         c.get_collective_forecast_monthly()

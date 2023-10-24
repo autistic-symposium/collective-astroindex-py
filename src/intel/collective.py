@@ -6,7 +6,7 @@ from datetime import timedelta, datetime
 
 import src.utils.os as os
 import src.utils.net as net
-import src.datalake.astro_api_wrapper as aw
+import src.datalake.astro_api_wrapper as aaw
 
 
 class CollectiveIndex:
@@ -20,6 +20,7 @@ class CollectiveIndex:
         self.sentiment_ranking, self.feature_ranking = self._load_ranking()
 
 
+        self.api = aaw.AstrologyAPIWrapper(self.env_vars)
         # TODO: clean this up
         self.collective_intel = os.load_yaml(self.env_vars['STRATEGIES_COLLECTIVE'])
         self.general_intel = os.load_yaml(self.env_vars['STRATEGIES_GENERAL'])
@@ -415,7 +416,7 @@ class CollectiveIndex:
 
         for planet in super_bullish_planets:
             
-            if self.planets_now[planet] in planets_exaltation:
+            if planet in self.planets_now and self.planets_now[planet] in planets_exaltation:
                 os.log_debug(f'{planet} is exalted in {self.planets_now[planet]}')
                 index += float(self.feature_ranking['exalted_planet'])
             
@@ -457,7 +458,7 @@ class CollectiveIndex:
         
         for planet in bearish_planets:
             
-            if self.planets_now[planet] in planets_exaltation:
+            if planet in self.planets_now and self.planets_now[planet] in planets_exaltation:
                 os.log_debug(f'{planet} is exalted in {self.planets_now[planet]}')
                 index -= float(self.feature_ranking['detriment_planet'])
             
@@ -653,301 +654,89 @@ class CollectiveIndex:
     #       Public methods
     #############################
 
-    def get_collective_forecast_today(self) -> None:
-        """
-            Get collective forecast now.
+    def get_transits_daily(self) -> None:
 
-            {
-            "transit_date": "17-6-2017",
-            "ascendant": "Leo",
-            "transit_house": [
-                {
-                    "planet": "Sun",
-                    "natal_sign": "Taurus",
-                    "transit_house": 11,
-                    "is_retrograde": false
-                },],
-            "transit_relation": [
-                {
-                    "transit_planet": "Sun",
-                    "natal_planet": "Jupiter",
-                    "type": "Sextile",
-                    "orb": 0.66
-                },],
-                "retrogrades": [],
-                "moon_phase": null
-            }
-        """
+        os.log_info(f'Getting transits daily...')
+        response = self.api.request_transits_daily()
 
-        os.log_info(f'Getting collective forecast today...')
-        astro_api = aw.AstrologyAPIWrapper(self.env_vars)
-        self.timespace = astro_api.get_timespace_dict(self.location)
-        data = astro_api.request_transits_daily()
-        self._parse_data_transits_daily(data)
-        
+        self._parse_data_transits_daily(response)
         this_index = self._create_index_transits_daily()
-
-        
-        key = aw.get_date_from_timezone(self.timespace['tzone_name']).strftime("%Y-%m-%d_%H-%M-%S")
-
+        key = self.api.get_request_date()
         self.collective_index[key] = this_index
         os.log_info(f'Daily Index ({key}): {this_index}')
 
 
-    def get_collective_forecast_monthly(self) -> None:
-        """
-            Get collective forecast monthly.
+    def get_collective_transits_monthly(self) -> None:
 
-            {
-                "month_start_date": "1-6-2017",
-                "month_end_date": "30-6-2017",
-                "ascendant": "Leo",
-                "transit_relation": [
-                    {
-                        "transit_planet": "Mars",
-                        "natal_planet": "Moon",
-                        "type": "Trine",
-                        "orb": 3.84,
-                        "date": "1-6-2017"
-                    },],
-                "retrogrades": [],
-                "moon_phase": [
-                    {
-                        "phase_type": "Full Moon",
-                        "date": "2017-06-09T13:11:00.000Z",
-                        "sign": "Sagittarius",
-                        "house": 5
-                    },]}
-        """
+        os.log_info(f'Getting collective transits monthly...')
+        response = self.api.request_transits_monthly()
 
-        os.log_info(f'Getting collective forecast monthly...')
-        astro_api = aw.AstrologyAPIWrapper(self.env_vars)
-        self.timespace = astro_api.get_timespace_dict(self.location)
-        data = astro_api.request_transits_monthly()
-        self._parse_data_transits_monthly(data)
-        
+        self._parse_data_transits_monthly(response)
         self._create_index_transits_monthly()
         os.log_info(f'Monthly indexes: {self.transit_index}')
 
 
     def get_collective_forecast_custom(self) -> None:
-        """ 
-            Get collective custom forecast daily.
 
-            {
-            "transit_date": "1-25-2023",
-            "ascendant": "Sagittarius",
-            "transit_relation": [
-                {
-                    "transit_planet": "Sun",
-                    "natal_planet": "Mercury",
-                    "aspect_type": "Conjunction",
-                    "start_time": "2023-01-23 05:57:47",
-                    "exact_time": "2023-01-25 05:08:14",
-                    "end_time": "2023-01-27 04:20:14",
-                    "is_retrograde": false,
-                    "transit_sign": "Aquarius",
-                    "natal_house": 3,
-                    "planet_in_signs": [
-                        "Saturn"
-                    ]
-                },
-                {
-        """
 
         os.log_info(f'Getting collective custom forecast daily...')
-        astro_api = aw.AstrologyAPIWrapper(self.env_vars)
-        self.timespace = astro_api.get_timespace_dict(self.location)
-        data = aw.request_transits_custom_daily()
+        response = self.api.request_transits_natal_daily()
         
-        self._parse_data_transits_daily_custom(data)
-        
+        self._parse_data_transits_daily_custom(response)
         self._create_index_transits_daily_custom()
         os.log_info(f'Daily custom indexes: {self.transit_index}')
 
 
     # TODO: move moon to other class?
     def get_collective_forecast_moon(self) -> None:
-        """ 
-            Get moon phase forecast.
 
-            {
-                "considered_date": "2-10-2017",
-                "moon_phase": "Balsamic Moon",
-                "significance": 
-            }
-        """
 
         # TODO: get other times
         os.log_info(f'Getting collective forecast moon...')
-        astro_api = aw.AstrologyAPIWrapper(self.env_vars)
-        self.timespace = astro_api.get_timespace_dict(self.location)
-        data = astro_api.request_transits_moon()
+        response = self.api.request_moon_phase()
         
-        self._parse_data_transits_moon(data)
-        
+        self._parse_data_transits_moon(response)
         this_index = self._create_index_transits_moon()
         os.log_info(f'Moon phases: {self.moon_phase}')
         os.log_info(f'Moon index: {this_index}')
 
     
     def get_transit_forecast(self) -> None:
-        """
-            Get transit forecast.
-
-            [{
-                    "name":"Sun",
-                    "fullDegree":330.41334722167386,
-                    "normDegree":0.4133472216738596,
-                    "speed":1.0082712955819473,
-                    "isRetro":"false",
-                    "sign":"Pisces",
-                    "house":6
-                },
-                {
-                    "name":"Moon",
-                    "fullDegree":114.14261905777207,
-                    "normDegree":24.142619057772066,
-                    "speed":12.96038356718529,
-                    "isRetro":"false",
-                    "sign":"Cancer",
-                    "house":10
-                },
-        """
 
         os.log_info(f'Getting transit forecast...')
-        astro_api = aw.AstrologyAPIWrapper(self.env_vars)
-        self.timespace = astro_api.get_timespace_dict(self.location)
-        data = astro_api.request_transits_forecast()
+        response = self.api.request_planet_tropical()
 
-        self._parse_data_transits_forecast(data)
-
+        self._parse_data_transits_forecast(response)
         this_index = self._create_index_transits_forecast()
         os.log_info(f'Transit index: {this_index}')
         
 
     def get_wheel(self) -> None:
-        """Get wheel forecast."""
 
         os.log_info(f'Getting wheel...')
-        astro_api = aw.AstrologyAPIWrapper(self.env_vars)
-        self.timespace = astro_api.get_timespace_dict(self.location)
-        data = astro_api.request_wheel()
+        response = self.api.request_natal_wheel()
 
-        self._parse_data_wheel(data)
+        self._parse_data_wheel(response)
     
 
     def get_chart_data(self) -> None:
-        """
-            Get chart data.
-            This endpoint brings more aspects (e.g., quintile, semisextile).
-
-            {
-            "houses": [
-                {
-                    "start_degree": 138.21238,
-                    "end_degree": 165.28495,
-                    "sign": "Leo",
-                    "house_id": 1,
-                    "planets": []
-                },
-            "aspects": [
-                {
-                    "aspecting_planet": "Sun",
-                    "aspected_planet": "Moon",
-                    "aspecting_planet_id": 0,
-                    "aspected_planet_id": 1,
-                    "type": "Quincunx",
-                    "orb": 0.22,
-                    "diff": 149.78
-                },
-        
-        """
 
         os.log_info(f'Getting chart data...')
-        astro_api = aw.AstrologyAPIWrapper(self.env_vars)
-        self.timespace = astro_api.get_timespace_dict(self.location)
-        data = astro_api.request_chart_data()
+        response = self.api.request_chart_data()
 
-        self._parse_data_chart_data(data)
+        self._parse_data_chart_data(response)
 
         this_index = self._create_index_chart_data()
         os.log_info(f'Chart data index: {this_index}')
 
 
-    def get_whole_sign_houses(self) -> None:
-        """
-            Get whole sign houses.
-            This endpoint brings vertex, midheaven, lilith
-            and can be set to whole sign.
+    def get_western_horoscope(self) -> None:
+       
+        os.log_info(f'Getting western horoscope...')
+        response = self.api.request_western_horoscope()
 
-            {
-                "planets": [
-                    {
-                        "name": "Sun",
-                        "full_degree": 275.6427,
-                        "norm_degree": 5.6427,
-                        "speed": 1.019,
-                        "is_retro": "false",
-                        "sign_id": 10,
-                        "sign": "Capricorn",
-                        "house": 2
-                    },
-                "houses": [
-                    {
-                        "house": 1,
-                        "sign": "Sagittarius",
-                        "degree": 240.71431
-                    },
-                "ascendant": 240.71431015862024,
-                "midheaven": 156.92135925483103,
-                "vertex": 118.53668227404134,
-                "lilith": {
-                    "name": "Lilith",
-                    "full_degree": 134.6796,
-                    "norm_degree": 14.6796,
-                    "speed": 0.1113,
-                    "is_retro": "false",
-                    "sign_id": 5,
-                    "sign": "Leo",
-                    "house": 9
-                },
-                "aspects": [
-                    {
-                        "aspecting_planet": "Sun",
-                        "aspected_planet": "Mercury",
-                        "aspecting_planet_id": 0,
-                        "aspected_planet_id": 3,
-                        "type": "Conjunction",
-                        "orb": 2.66,
-                        "diff": 2.66
-                    },
-        """
-
-        os.log_info(f'Getting whole sign houses...')
-        astro_api = aw.AstrologyAPIWrapper(self.env_vars)
-        self.timespace = astro_api.get_timespace_dict(self.location)
-        data = astro_api.request_whole_sign_houses()
-
-        self._parse_data_whole_sign_houses(data)
+        self._parse_data_whole_sign_houses(response)
 
         this_index = self._create_index_whole_sign_houses()
         os.log_info(f'Whole sign houses index: {this_index}')
 
-
-    def get_natal_chart(self) -> None:
-        """
-            Get natal chart.
-            This endpoint brings vertex, midheaven, lilith,
-            plus a lot of other data (element analysis, moon phase, etc.).
-        """
-
-        os.log_info(f'Getting natal chart...')
-        astro_api = aw.AstrologyAPIWrapper(self.env_vars)
-        self.timespace = astro_api.get_timespace_dict(self.location)
-        data = astro_api.request_natal_chart()
-
-        self._parse_data_natal_chart(data)
-
-        this_index = self._create_index_natal_chart()
-        os.log_info(f'Natal chart index: {this_index}')

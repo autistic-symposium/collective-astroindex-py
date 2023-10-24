@@ -4,6 +4,8 @@
 
 TODO: clean up this README
 
+https://astrologyapi.com/docs/api-ref
+
 <br>
 
 ## install
