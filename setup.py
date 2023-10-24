@@ -5,6 +5,7 @@ setup(
     version='0.1',
     packages=find_packages(include=['src', \
                     'src.intel', \
+                    'src.datalake', \
                     'src.utils']),
     author="bt3gl",
     install_requires=['python-dotenv'],

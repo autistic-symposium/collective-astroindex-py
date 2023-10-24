@@ -3,9 +3,15 @@
 
 import src.utils.net as net
 import src.utils.os as os
+from urllib.parse import urljoin
 
 
 class AstrologyAPIWrapper:
+
+    def __init__(self, env_vars) -> None:
+
+        self.env_vars = env_vars
+        self.timespace_dict = {}
 
 
     def get_timespace_dict(self, day=None, 
@@ -32,7 +38,7 @@ class AstrologyAPIWrapper:
             day, month, year, hour, mins = net.get_datetime_now_at_given_timezone(tzone_name)
         os.log_debug(f'Using date {day}/{month}/{year} {hour}:{mins}')
 
-        return {
+        self.timespace_dict = {
             'day': day,
             'month': month,
             'year': year,
@@ -42,59 +48,62 @@ class AstrologyAPIWrapper:
             'lon': lon,
             'tzone': tzone,
             'tzone_name': tzone_name
-        }    
+        }  
 
-    def craft_request(env_vars, endpoint, data, custom_data=None) -> dict:
-    """Send request to a designed endpoint in the API."""
+        return self.timespace_dict  
+
+
+    def _craft_request(self, endpoint, custom_data=None) -> dict:
+        """Send request to a designed endpoint in the API."""
 
         if custom_data:
-            data.update(custom_data)
+            self.timespace_dict.update(custom_data)
 
-        api_key = env_vars['API_KEY']
-        usr_id = env_vars['USER_ID']
-        url = urljoin(env_vars['API_URL'], endpoint)
+        api_key = self.env_vars['API_KEY']
+        usr_id = self.env_vars['USER_ID']
+        url = urljoin(self.env_vars['API_URL'], endpoint)
         os.log_debug(f'Requesting URL {url}')
 
-        return send_request(url, data, auth=(usr_id, api_key))
+        return net.send_request(url, self.timespace_dict, auth=(usr_id, api_key))
 
 
 
-    def _request_transits_daily(self) -> dict:
+    def request_transits_daily(self) -> dict:
         """Request transits daily from API."""
 
         endpoint = 'tropical_transits/daily'
-        return net.craft_request(self.env_vars, endpoint, self.timespace)
+        return self._craft_request(endpoint)
 
 
-    def _request_transits_monthly(self) -> dict:
+    def request_transits_monthly(self) -> dict:
         """Request transits monthly from API."""
 
         endpoint = 'tropical_transits/monthly'
-        return net.craft_request(self.env_vars, endpoint, self.timespace)
+        return self._craft_request(endpoint)
 
 
-    def _request_transits_custom_daily(self) -> dict:
+    def request_transits_custom_daily(self) -> dict:
         """Request custom transits daily from API."""
 
         endpoint = 'natal_transits/daily'
-        return net.craft_request(self.env_vars, endpoint, self.timespace)
+        return self._craft_request(endpoint)
 
 
-    def  _request_transits_moon(self) -> dict:
+    def  request_transits_moon(self) -> dict:
         """Request moon phase from API."""
 
         endpoint = 'moon_phase_report'
-        return net.craft_request(self.env_vars, endpoint, self.timespace)
+        return self._craft_request(endpoint)
 
     
-    def _request_transits_forecast(self) -> dict:
+    def request_transits_forecast(self) -> dict:
         """Request transits forecast from API."""
 
         endpoint = 'planets/tropical'
-        return net.craft_request(self.env_vars, endpoint, self.timespace)
+        return self._craft_request(endpoint)
 
     
-    def _request_wheel(self) -> dict:
+    def request_wheel(self) -> dict:
         """Request wheel from API."""
 
         endpoint = 'natal_wheel_chart'
@@ -106,17 +115,17 @@ class AstrologyAPIWrapper:
             'chart_size': '500',
             'image_type': 'png',
         }
-        return net.craft_request(self.env_vars, endpoint, self.timespace, custom_data)
+        return self._craft_request(endpoint, custom_data)
 
 
-    def _request_chart_data(self) -> dict:
+    def request_chart_data(self) -> dict:
         """Request chart data from API."""
 
         endpoint = 'western_chart_data'
-        return net.craft_request(self.env_vars, endpoint, self.timespace)
+        return self._craft_request(endpoint)
 
     
-    def _request_whole_sign_houses(self) -> dict:
+    def request_whole_sign_houses(self) -> dict:
         """Request whole sign houses from API."""
 
         endpoint = 'western_horoscope'
@@ -125,11 +134,11 @@ class AstrologyAPIWrapper:
             'system': 'whole_sign',
             'house_system': 'whole_sign',
         }
-        return net.craft_request(self.env_vars, endpoint, self.timespace, custom_data)
+        return self._craft_request(endpoint, custom_data)
 
-    def _request_natal_chart(self) -> dict:
+    def request_natal_chart(self) -> dict:
         """Request natal chart from API."""
 
         endpoint = 'natal_chart_interpretation'
-        return net.craft_request(self.env_vars, endpoint, self.timespace)
+        return self._craft_request(endpoint)
 

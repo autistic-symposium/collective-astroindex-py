@@ -6,7 +6,6 @@ import geocoder
 import requests
 from dateutil import tz
 from datetime import datetime
-from urllib.parse import urljoin
 from timezonefinder import TimezoneFinder
 
 import src.utils.os as os

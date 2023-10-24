@@ -6,6 +6,7 @@ from datetime import timedelta, datetime
 
 import src.utils.os as os
 import src.utils.net as net
+import src.datalake.astro_api_wrapper as aw
 
 
 class CollectiveIndex:
@@ -27,7 +28,6 @@ class CollectiveIndex:
         
         self.collective_index = {}
         self.location = (city, country)
-        self.timespace = net.get_timespace_dict(self.location)
         self.ascendant_now = None
         self.houses_now = {h: [] for h in range(1, 13)}
         self.planets_now = {}
@@ -680,11 +680,15 @@ class CollectiveIndex:
         """
 
         os.log_info(f'Getting collective forecast today...')
-        data = self._request_transits_daily()
+        astro_api = aw.AstrologyAPIWrapper(self.env_vars)
+        self.timespace = astro_api.get_timespace_dict(self.location)
+        data = astro_api.request_transits_daily()
         self._parse_data_transits_daily(data)
         
         this_index = self._create_index_transits_daily()
-        key = net.get_date_from_timezone(self.timespace['tzone_name']).strftime("%Y-%m-%d_%H-%M-%S")
+
+        
+        key = aw.get_date_from_timezone(self.timespace['tzone_name']).strftime("%Y-%m-%d_%H-%M-%S")
 
         self.collective_index[key] = this_index
         os.log_info(f'Daily Index ({key}): {this_index}')
@@ -717,7 +721,9 @@ class CollectiveIndex:
         """
 
         os.log_info(f'Getting collective forecast monthly...')
-        data = self._request_transits_monthly()
+        astro_api = aw.AstrologyAPIWrapper(self.env_vars)
+        self.timespace = astro_api.get_timespace_dict(self.location)
+        data = astro_api.request_transits_monthly()
         self._parse_data_transits_monthly(data)
         
         self._create_index_transits_monthly()
@@ -750,7 +756,9 @@ class CollectiveIndex:
         """
 
         os.log_info(f'Getting collective custom forecast daily...')
-        data = self._request_transits_custom_daily()
+        astro_api = aw.AstrologyAPIWrapper(self.env_vars)
+        self.timespace = astro_api.get_timespace_dict(self.location)
+        data = aw.request_transits_custom_daily()
         
         self._parse_data_transits_daily_custom(data)
         
@@ -772,7 +780,9 @@ class CollectiveIndex:
 
         # TODO: get other times
         os.log_info(f'Getting collective forecast moon...')
-        data = self._request_transits_moon()
+        astro_api = aw.AstrologyAPIWrapper(self.env_vars)
+        self.timespace = astro_api.get_timespace_dict(self.location)
+        data = astro_api.request_transits_moon()
         
         self._parse_data_transits_moon(data)
         
@@ -806,7 +816,9 @@ class CollectiveIndex:
         """
 
         os.log_info(f'Getting transit forecast...')
-        data = self._request_transits_forecast()
+        astro_api = aw.AstrologyAPIWrapper(self.env_vars)
+        self.timespace = astro_api.get_timespace_dict(self.location)
+        data = astro_api.request_transits_forecast()
 
         self._parse_data_transits_forecast(data)
 
@@ -818,7 +830,9 @@ class CollectiveIndex:
         """Get wheel forecast."""
 
         os.log_info(f'Getting wheel...')
-        data = self._request_wheel()
+        astro_api = aw.AstrologyAPIWrapper(self.env_vars)
+        self.timespace = astro_api.get_timespace_dict(self.location)
+        data = astro_api.request_wheel()
 
         self._parse_data_wheel(data)
     
@@ -851,7 +865,9 @@ class CollectiveIndex:
         """
 
         os.log_info(f'Getting chart data...')
-        data = self._request_chart_data()
+        astro_api = aw.AstrologyAPIWrapper(self.env_vars)
+        self.timespace = astro_api.get_timespace_dict(self.location)
+        data = astro_api.request_chart_data()
 
         self._parse_data_chart_data(data)
 
@@ -909,7 +925,9 @@ class CollectiveIndex:
         """
 
         os.log_info(f'Getting whole sign houses...')
-        data = self._request_whole_sign_houses()
+        astro_api = aw.AstrologyAPIWrapper(self.env_vars)
+        self.timespace = astro_api.get_timespace_dict(self.location)
+        data = astro_api.request_whole_sign_houses()
 
         self._parse_data_whole_sign_houses(data)
 
@@ -925,7 +943,9 @@ class CollectiveIndex:
         """
 
         os.log_info(f'Getting natal chart...')
-        data = self._request_natal_chart()
+        astro_api = aw.AstrologyAPIWrapper(self.env_vars)
+        self.timespace = astro_api.get_timespace_dict(self.location)
+        data = astro_api.request_natal_chart()
 
         self._parse_data_natal_chart(data)
 
