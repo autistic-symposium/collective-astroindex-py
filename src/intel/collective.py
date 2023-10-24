@@ -43,7 +43,7 @@ class CollectiveIndex:
         # TODO: clean this up
         self.collective_intel = os.load_yaml(self.env_vars['STRATEGIES_COLLECTIVE'])
         self.general_intel = os.load_yaml(self.env_vars['STRATEGIES_GENERAL'])
-        self.moon_intel = os.load_yaml(self.env_vars['STRATEGIES_MOON'])
+        #self.moon_intel = os.load_yaml(self.env_vars['STRATEGIES_MOON'])
 
         
         self.collective_index = {}
@@ -719,3 +719,11 @@ class CollectiveIndex:
         this_date = self.api.get_request_date()
 
         os.log_info(f'Index I.h ({this_date}): {this_index}')
+
+    
+    def get_collective_index(self) -> None:
+
+        pass
+        # TODO: add all indexes
+        # TODO: add plot plot.plot_collective(self.collective_index, 'Collective Astro Index I')
+        # normalize index

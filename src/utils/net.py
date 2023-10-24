@@ -6,8 +6,8 @@ import geocoder
 import requests
 from dateutil import tz
 from datetime import datetime
-from timezonefinder import TimezoneFinder
 from urllib.parse import urljoin
+from timezonefinder import TimezoneFinder
 
 import src.utils.os as os
 
@@ -80,7 +80,4 @@ def compose_url(url, endpoint) -> str:
     """Compose url from base and endpoint."""
 
     return urljoin(url, endpoint)
-
-    
-
 

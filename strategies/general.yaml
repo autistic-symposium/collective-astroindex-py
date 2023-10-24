@@ -1,4 +1,5 @@
-# this is a overall list of features that are used in the strategies
+# this is a overall list of features that are used so that we
+# can define specific strategies in the next yaml files
 
 
 dignities:
@@ -57,6 +58,7 @@ dignities:
   'ketu':
     'sagittarius': 'exalted'
 
+
 houses_by_element:
   1: 'fire'
   2: 'earth'
@@ -69,6 +71,7 @@ houses_by_element:
   10: 'earth'
   11: 'air'
   12: 'water'
+
 
 signs_by_element:
   'aries': fire
@@ -84,6 +87,7 @@ signs_by_element:
   'aquarius': air
   'pisces': water
 
+
 houses_by_sign:
   1: 'aries'
   2: 'taurus'
@@ -97,6 +101,7 @@ houses_by_sign:
   10: 'capricorn'
   11: 'aquarius'
   12: 'pisces'
+
 
 aspects:
   'conjunction': 0
@@ -120,44 +125,20 @@ aspects:
   'triseptile': 154.28571428571428
 
 
-
-
-
-
-
-# TODO: fix this https://en.wikipedia.org/wiki/Exaltation_(astrology)
-angles_exaltation:
-  'sun': [19, 10]
-  'moon': 3
-  'mercury': 15
-  'venus': 27
-  'mars': 28
-  'jupiter': [5, 15]
-  'saturn': [21, 20]
-  'nnode': 3
-
-angles_detriment:
-  'sun': [19, 10]
-  'moon': 3
-  'mercury': 15
-  'venus': 27
-  'mars': 28
-  'jupiter': [5, 15]
-  'saturn': [21, 20]
-
-# TODO: add support to other aspects
-
-
-angle_aspects_ranking:
-  'conjunction': 10
-  'opposition': -8
-  'trine': 5
-  'square': -5
-  'sextile': 5
-  'quincunx': -3
-  'semi sextile': 3
-  'semi square': -3
-  'quintile': 3
-
-
-
+dignities_by_angles:
+  'sun':
+    - 19: 'exalted'
+  'moon':
+    - 3: 'exalted'
+  'mercury':
+    - 15: 'exalted'
+  'venus':
+    - 27: 'exalted'
+  'mars':
+    - 28: 'exalted'
+  'jupiter':
+    - 15: 'exalted'
+  'saturn':
+    - 21: 'exalted'
+  'rahu':
+    - 3: 'exalted'

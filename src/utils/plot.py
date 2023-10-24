@@ -1,9 +1,9 @@
 # -*- encoding: utf-8 -*-
 # src/utils/plot.py
 
-import matplotlib.pyplot as plt
-import numpy as np
+
 from datetime import datetime
+import matplotlib.pyplot as plt
 
 
 FONT = {
@@ -14,15 +14,14 @@ FONT = {
         }
 
 
-def plot_collective(data: dict, title):
-    """Plot collective bullish index."""
+def plot_collective(data: dict, title) -> None:
 
-    plt.title(title, fontdict=FONT)
     plt.xlabel('Date', fontdict=FONT)
-    plt.ylabel('Index', fontdict=FONT)
+    plt.ylabel('Normalized Index', fontdict=FONT)
+    plt.title('Collective Astro Index I', fontdict=FONT)
 
     ordered_data = sorted(data.items(), key = lambda x: datetime.strptime(x[0], '%d-%m-%Y'))
-
     x, y = zip(*ordered_data) 
+    
     plt.plot(x, y)
     plt.show()

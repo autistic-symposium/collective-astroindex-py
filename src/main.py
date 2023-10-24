@@ -62,9 +62,7 @@ def run() -> None:
         c.get_western_horoscope()
 
     elif args.collective_index:
-        # TODO: add all indexes
-        # TODO: add plot
-        pass
+        c.get_collective_index()
 
     else:
         parser.print_help()

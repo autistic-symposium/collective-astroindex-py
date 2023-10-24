@@ -2,6 +2,11 @@
 # they are generally used to determine the overall market sentiment
 # and they are a high level intel of transits
 
+
+######################
+#     HOUSES
+######################
+
 ascendant:
   aries: slightly_bullish        # 5th house leo, 8th house scorpio
   taurus: slightly_bullish       # 5th house virgo, 8th house sagittarius
@@ -16,6 +21,7 @@ ascendant:
   aquarius: slightly_bullish     # 5th house gemini, 8th house virgo
   pisces: slightly_bearish       # 5th house cancer, 8th house libra
 
+
 houses:
   1: neutral
   2: slightly_bullish
@@ -29,6 +35,12 @@ houses:
   10: slightly_bullish
   11: slightly_bullish
   12: slightly_bearish
+
+
+
+######################
+#     PLANETS
+######################
 
 planets:
   ascendant: neutral
@@ -58,6 +70,12 @@ dignities:
   face: neutral
   peregrine: neutral
 
+
+
+######################
+#     ASPECTS
+######################
+
 aspects:
   conjunction: super_bullish
   opposition: super_bearish
@@ -69,3 +87,18 @@ aspects:
   semisquare: neutral
   sesquiquadrate: neutral
   quintile: neutral
+
+
+######################
+#     MOON
+######################
+
+moon_phase:
+  'First Quarter Moon': bullish
+  'Full Moon': bearish
+  'Last Quarter Moon': unclear
+  'New Moon': bullish
+  'Waning Crescent Moon': unclear
+  'Waning Gibbous Moon': unclear
+  'Waxing Crescent Moon': unclear
+  'Waxing Gibbous Moon': unclear

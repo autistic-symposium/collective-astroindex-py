@@ -66,8 +66,7 @@ class AstrologyAPIWrapper:
     
     def get_request_date(self) -> dict:
 
-        fmt_string  = "%Y-%m-%d_%H-%M-%S"
-        return net.get_date_from_timezone(self.timespace['tzone_name']).strftime(fmt_string)
+        return net.get_date_from_timezone(self.timespace['tzone_name']).strftime("%Y-%m-%d")
 
 
     #############################  

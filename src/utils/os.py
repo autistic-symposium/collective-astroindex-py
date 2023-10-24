@@ -10,23 +10,6 @@ from dotenv import load_dotenv
 from pprint import PrettyPrinter
 
 
-def set_logging(log_level: str) -> None:
-    """Set logging level according to .env config."""
-
-    if log_level == 'INFO' or log_level == 'info':
-        logging.basicConfig(level=logging.INFO, format='%(message)s')
-
-    elif log_level == 'ERROR' or log_level == 'error':
-        logging.basicConfig(level=logging.ERROR, format='%(message)s')
-
-    elif log_level == 'DEBUG' or log_level == 'debug':
-        logging.basicConfig(level=logging.DEBUG, format='%(message)s')
-
-    else:
-        print(f'Logging level {log_level} is not available. Setting to ERROR')
-        logging.basicConfig(level=logging.ERROR, format='%(message)s')
-
-
 def load_config() -> dict:
     """Load and set environment variables."""
 
@@ -47,12 +30,29 @@ def load_config() -> dict:
         env_vars['STRATEGIES_GENERAL'] = os.getenv('STRATEGIES_GENERAL')
         env_vars['STRATEGIES_COLLECTIVE'] = os.getenv('STRATEGIES_COLLECTIVE')
         env_vars['STRATEGIES_RANKING'] = os.getenv('STRATEGIES_RANKING')
-        env_vars['STRATEGIES_MOON'] = os.getenv('STRATEGIES_MOON')
+        env_vars['STRATEGIES_PLANETS_ASPECTS'] = os.getenv('STRATEGIES_PLANETS_ASPECTS')
 
         return env_vars
 
     except KeyError as e:
         exit_with_error(f'Cannot extract env variables: {e}. Exiting.')
+
+
+def set_logging(log_level: str) -> None:
+    """Set logging level according to .env config."""
+
+    if log_level == 'INFO' or log_level == 'info':
+        logging.basicConfig(level=logging.INFO, format='%(message)s')
+
+    elif log_level == 'ERROR' or log_level == 'error':
+        logging.basicConfig(level=logging.ERROR, format='%(message)s')
+
+    elif log_level == 'DEBUG' or log_level == 'debug':
+        logging.basicConfig(level=logging.DEBUG, format='%(message)s')
+
+    else:
+        print(f'Logging level {log_level} is not available. Setting to ERROR')
+        logging.basicConfig(level=logging.ERROR, format='%(message)s')
 
 
 def load_yaml(path: str) -> dict:
