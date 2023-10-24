@@ -640,10 +640,9 @@ class CollectiveIndex:
 
     def get_transits_daily(self) -> None:
 
-        os.log_info(f'Getting transits daily...')
-
         response = self.api.request_transits_daily()
         self._parse_transits_daily(response)
+
         this_index = self._create_index_transits_daily()
         this_date = self.api.get_request_date()
 
@@ -652,75 +651,71 @@ class CollectiveIndex:
 
     def get_transits_monthly(self) -> None:
 
-        os.log_info(f'Getting collective transits monthly...')
         response = self.api.request_transits_monthly()
-
         self._parse_transits_monthly(response)
-        self._create_index_transits_monthly()
-        os.log_info(f'Monthly indexes: {self.transit_index}')
+
+        this_index = self._create_index_transits_monthly()
+        this_date = self.api.get_request_date()
+
+        os.log_info(f'Index I.b ({this_date}): {this_index}')
 
 
-    def get_collective_forecast_custom(self) -> None:
+    def get_transits_natal_daily(self) -> None:
 
-
-        os.log_info(f'Getting collective custom forecast daily...')
         response = self.api.request_transits_natal_daily()
-        
-        self._parse_data_transits_daily_custom(response)
-        self._create_index_transits_daily_custom()
-        os.log_info(f'Daily custom indexes: {self.transit_index}')
+        self._parse_transits_natal_daily(response)
+
+        this_index = self._create_transits_natal_daily()
+        this_date = self.api.get_request_date()
+
+        os.log_info(f'Index I.c ({this_date}): {this_index}')
 
 
-    # TODO: move moon to other class?
-    def get_collective_forecast_moon(self) -> None:
+    def get_moon_phase(self) -> None:
 
-
-        # TODO: get other times
-        os.log_info(f'Getting collective forecast moon...')
         response = self.api.request_moon_phase()
+        self._parse_moon_phase(response)
         
-        self._parse_data_transits_moon(response)
-        this_index = self._create_index_transits_moon()
-        os.log_info(f'Moon phases: {self.moon_phase}')
-        os.log_info(f'Moon index: {this_index}')
+        this_index = self._create_index_moon_phase()
+        this_date = self.api.get_request_date()
+
+        os.log_info(f'Index I.d ({this_date}): {this_index}')
 
     
-    def get_transit_forecast(self) -> None:
+    def get_planet_tropical(self) -> None:
 
-        os.log_info(f'Getting transit forecast...')
         response = self.api.request_planet_tropical()
+        self._parse_planet_tropical(response)
 
-        self._parse_transits_forecast(response)
-        this_index = self._create_index_transits_forecast()
-        os.log_info(f'Transit index: {this_index}')
+        this_index = self._create_index_planet_tropical()
+        this_date = self.api.get_request_date()
+
+        os.log_info(f'Index I.e ({this_date}): {this_index}')
         
 
-    def get_wheel(self) -> None:
+    def get_natal_wheel(self) -> None:
 
-        os.log_info(f'Getting wheel...')
         response = self.api.request_natal_wheel()
-
-        self._parse_data_wheel(response)
+        self._parse_natal_wheel(response)
     
 
     def get_chart_data(self) -> None:
 
-        os.log_info(f'Getting chart data...')
         response = self.api.request_chart_data()
-
-        self._parse_data_chart_data(response)
+        self._parse_chart_data(response)
 
         this_index = self._create_index_chart_data()
-        os.log_info(f'Chart data index: {this_index}')
+        this_date = self.api.get_request_date()
+
+        os.log_info(f'Index I.g ({this_date}): {this_index}')
 
 
     def get_western_horoscope(self) -> None:
        
-        os.log_info(f'Getting western horoscope...')
         response = self.api.request_western_horoscope()
+        self._parse_western_horoscope(response)
 
-        self._parse_data_whole_sign_houses(response)
+        this_index = self._create_index_western_horoscope()
+        this_date = self.api.get_request_date()
 
-        this_index = self._create_index_whole_sign_houses()
-        os.log_info(f'Whole sign houses index: {this_index}')
-
+        os.log_info(f'Index I.h ({this_date}): {this_index}')

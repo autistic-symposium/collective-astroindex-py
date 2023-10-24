@@ -2,8 +2,8 @@
 # src/datalake/AstrologyAPIWrapper.py
 
 
-import src.utils.net as net
 import src.utils.os as os
+import src.utils.net as net
 
 
 class AstrologyAPIWrapper:
