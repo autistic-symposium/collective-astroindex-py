@@ -106,6 +106,9 @@ https://json.astrologyapi.com:443 "POST /v1/tropical_transits/daily?header=Conte
 * check enigma https://radixpro.com/enigma/ 
 * check https://mirror.xyz/polymarket.eth 
 * check https://uma.xyz/#osnap 
-
+* check astronomy https://docs.astronomyapi.com/
+* check https://github.com/astrorigin/pyswisseph 
+* astrologer studies https://www.astrologer.com/studies 
+* graphs from https://cafeastrology.com/businessromancegraphs.html 
 
 
