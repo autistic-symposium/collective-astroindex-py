@@ -26,6 +26,30 @@ class Collective:
         self.transit_monthly = {}
         self.transit_now_custom = {}
         self.transit_moon = {}
+        self.transit_forecast = {}
+        self.chart_data = {'houses': [], 'aspects': []}
+        self.whole_sign_houses = {
+                        'planets': [], 
+                        'houses': [], 
+                        'vertex': None, 
+                        'midheaven': None,
+                        'lilith': None,
+                        'aspects': [],
+                        'ascendant': None
+                        }
+        self.natal_chart = {
+                        'planets': [],
+                        'houses': [],
+                        'aspects': [],
+                        'ascendant': None,
+                        'midheaven': None,
+                        'lilith': None,
+                        'vertex': None,
+                        'moon_phase': [],
+                        'elements': [],
+                        'modes': [],
+                        'dominant_signs': []
+                        }
 
         self.transit_index = {}
         self.ranking = self._get_ranking_scale()
@@ -70,6 +94,53 @@ class Collective:
         """Request moon phase from API."""
 
         endpoint = 'moon_phase_report'
+        return net.craft_request(self.env_vars, endpoint, self.timespace)
+
+    
+    def _request_transits_forecast(self) -> dict:
+        """Request transits forecast from API."""
+
+        endpoint = 'planets/tropical'
+        return net.craft_request(self.env_vars, endpoint, self.timespace)
+
+    
+    def _request_wheel(self) -> dict:
+        """Request wheel from API."""
+
+        endpoint = 'natal_wheel_chart'
+        custom_data = {
+            'planet_icon_color': '#F57C00',
+            'inner_circle_background': '#FFF8E1',
+            'sign_icon_color': 'red',
+            'sign_background': '#ffffff',
+            'chart_size': '500',
+            'image_type': 'png',
+        }
+        return net.craft_request(self.env_vars, endpoint, self.timespace, custom_data)
+
+
+    def _request_chart_data(self) -> dict:
+        """Request chart data from API."""
+
+        endpoint = 'western_chart_data'
+        return net.craft_request(self.env_vars, endpoint, self.timespace)
+
+    
+    def _request_whole_sign_houses(self) -> dict:
+        """Request whole sign houses from API."""
+
+        endpoint = 'western_horoscope'
+        # TODO: which one is the one?
+        custom_data = {
+            'system': 'whole_sign',
+            'house_system': 'whole_sign',
+        }
+        return net.craft_request(self.env_vars, endpoint, self.timespace, custom_data)
+
+    def _request_natal_chart(self) -> dict:
+        """Request natal chart from API."""
+
+        endpoint = 'natal_chart_interpretation'
         return net.craft_request(self.env_vars, endpoint, self.timespace)
 
 
@@ -213,6 +284,181 @@ class Collective:
 
         print(f'Moon phase: {self.moon_phase}')
         print(f'Significance: {significance}')
+
+
+    def _parse_data_transits_forecast(self, data: dict) -> None:
+        """ Parse data from transit forecast."""
+
+        for obj in data:
+            planet = obj['name'].lower()
+            full_degree = obj['fullDegree']
+            norm_degree = obj['normDegree']
+            speed = obj['speed']
+            is_retrograde = obj['isRetro']
+            sign = obj['sign'].lower()
+            house = obj['house']
+            
+            if planet == 'Ascendant':
+                self.ascendant_now = sign
+            
+            self.transit_forecast[planet] = [full_degree, norm_degree, speed, is_retrograde, sign, house]
+            
+
+    def _parse_data_wheel(self, data: dict) -> None:
+        """Parse data from wheel."""
+
+        if data['status'] == True:
+            url = data['chart_url']
+            os.log_info(f'Wheel created: {url}')
+
+
+    def _parse_data_chart_data(self, data: dict) -> None:
+        """Parse data from chart data."""
+
+        for key, values in data.items():
+
+            if key == 'houses':
+                for value in values:
+                    start_degree = value['start_degree']
+                    end_degree = value['end_degree']
+                    sign = value['sign'].lower()
+                    house = value['house_id']
+                    planets = value['planets']
+
+                    self.chart_data['houses'].append((start_degree, end_degree, sign, house, planets))
+            
+            elif key == 'aspects':
+                for value in values:
+                    aspected_planet = value['aspected_planet'].lower()
+                    aspecting_planet = value['aspecting_planet'].lower()
+                    aspect = value['type'].lower()
+                    orb = value['orb']
+                    diff = value['diff']
+
+                    self.chart_data['aspects'].append((aspected_planet, aspecting_planet, aspect, orb, diff))
+
+    def _parse_data_whole_sign_houses(self, data: dict) -> None:
+        """Parse data from whole sign houses."""
+
+        for key, values in data.items():
+
+            if key == 'planets':
+                for value in values:
+                    planet = value['name']
+                    full_degree = value['full_degree']
+                    norm_degree = value['norm_degree']
+                    speed = value['speed']
+                    is_retrograde = value['is_retro']
+                    sign = value['sign'].lower()
+                    house = value['house']
+
+                    self.whole_sign_houses['planets'].append((planet, full_degree, norm_degree, speed, is_retrograde, sign, house))
+
+            elif key == 'houses':
+                for value in values:
+                    house = value['house']
+                    sign = value['sign'].lower()
+                    degree = value['degree']
+
+                    self.whole_sign_houses['houses'].append((house, sign, degree))
+
+            elif key == 'ascendant':
+                self.whole_sign_houses['ascendant'] = values
+
+            elif key == 'midheaven':
+                self.whole_sign_houses['midheaven'] = values
+        
+            elif key == 'vertex':
+                self.whole_sign_houses['vertex'] = values
+
+            elif key == 'lilith':
+                full_degree = values['full_degree']
+                norm_degree = values['norm_degree']
+                speed = values['speed']
+                is_retrograde = values['is_retro']
+                sign = values['sign'].lower()
+                house = values['house']
+                
+                self.whole_sign_houses['lilith'] = (full_degree, norm_degree, speed, is_retrograde, sign, house)
+
+            elif key == 'aspects':
+                for value in values:
+                    aspecting_planet = value['aspecting_planet'].lower()
+                    aspected_planet = value['aspected_planet'].lower()
+                    aspect = value['type'].lower()
+                    orb = value['orb']
+                    diff = value['diff']
+
+                    self.whole_sign_houses['aspects'].append((aspected_planet, aspecting_planet, aspect, orb, diff))
+
+
+    def _parse_data_natal_chart(self, data: dict) -> None:
+        """Parse data from natal chart."""
+
+        for key, values in data.items():
+
+            if key == 'planets':
+                for value in values:
+                    planet = value['name']
+                    full_degree = value['full_degree']
+                    norm_degree = value['norm_degree']
+                    speed = value['speed']
+                    is_retrograde = value['is_retro']
+                    sign = value['sign'].lower()
+                    house = value['house']
+
+                    self.natal_chart['planets'].append((planet, full_degree, norm_degree, speed, is_retrograde, sign, house))
+
+            elif key == 'houses':
+                for value in values:
+                    house = value['house']
+                    sign = value['sign'].lower()
+                    degree = value['degree']
+
+                    self.natal_chart['houses'].append((house, sign, degree))
+            
+            elif key == 'ascendant' or key == 'vertex' or key == 'midheaven':
+                self.natal_chart[key] = values
+            
+            elif key == 'lilith':
+                full_degree = values['full_degree']
+                norm_degree = values['norm_degree']
+                speed = values['speed']
+                is_retrograde = values['is_retro']
+                sign = values['sign'].lower()
+                house = values['house']
+
+                self.natal_chart['lilith'] = (full_degree, norm_degree, speed, is_retrograde, sign, house)
+
+            elif key == 'aspects':
+                for value in values:
+                    aspecting_planet = value['aspecting_planet'].lower()
+                    aspected_planet = value['aspected_planet'].lower()
+                    aspect = value['type'].lower()
+                    orb = value['orb']
+                    diff = value['diff']
+
+                    self.natal_chart['aspects'].append((aspected_planet, aspecting_planet, aspect, orb, diff))
+
+            elif key == 'moon_phase':
+                moon_phase_name = values['moon_phase_name']
+                self.natal_chart['moon_phase'].append(moon_phase_name)
+
+            elif key == 'elements':
+                for value in values['elements']:
+                    name = value['name']
+                    percentage = value['percentage']
+                    self.natal_chart['elements'].append((name, percentage))
+
+            elif key == 'modes':
+                for value in values['modes']:
+                    name = value['name']
+                    percentage = value['percentage']
+                    self.natal_chart['modes'].append((name, percentage))
+            
+            elif key == 'dominant_signs':
+                sign = values['sign_name']
+                percentage = values['percentage']
 
 
     ####################################################
@@ -369,6 +615,105 @@ class Collective:
         return this_index
 
 
+    def _create_index_transits_forecast(self) -> dict:
+        """Create index from transit forecast."""
+
+        this_index = 0
+        super_bullish_planets = self.collective_intel['super_bullish_planets']
+        investing_houses = self.collective_intel['investing_houses']
+        planets_exaltation = self.general_intel['planets_exaltation']
+    
+        for planet, data in self.transit_forecast.items():
+            full_degree, norm_degree, speed, is_retrograde, sign, house = data
+
+            if planet in planets_exaltation:
+                this_index += float(self.ranking['exalted'])
+            
+            if planet in self.retrogrades_now:
+                this_index -= float(self.ranking['retrograde'])
+            
+            if house in investing_houses:
+                this_index += float(self.ranking['super_bullish'])
+            
+            if planet in super_bullish_planets:
+                this_index += float(self.ranking['super_bullish'])
+            
+        
+        return this_index
+
+
+    def _create_index_chart_data(self) -> dict:
+        """Create index from chart data."""
+
+        this_index = 0
+        houses_ranking = self.collective_intel['investing_houses']
+        aspects_ranking = self.general_intel['angle_aspects_ranking']
+        ranking = self.ranking
+
+        for house in self.chart_data['houses']:
+            start_degree, end_degree, sign, house, planets = house
+            if house in houses_ranking:
+                this_index += float(ranking['super_bullish'])
+        
+        for aspect in self.chart_data['aspects']:
+            aspected_planet, aspecting_planet, aspect, orb, diff = aspect
+            # the api has a typo 'semi sqaure'
+            if aspect in aspects_ranking:
+                this_index += float(aspects_ranking[aspect])
+            else:
+                os.log_debug(f'Aspect {aspect} not found in aspects_ranking')
+
+        return this_index
+
+
+    def _create_index_whole_sign_houses(self) -> dict:
+        """Create index from whole sign houses."""
+
+        this_index = 0
+        houses_ranking = self.collective_intel['investing_houses']
+        aspects_ranking = self.general_intel['angle_aspects_ranking']
+        ranking = self.ranking
+
+        for planet in self.whole_sign_houses['planets']:
+            planet, full_degree, norm_degree, speed, is_retrograde, sign, house = planet
+            if house in houses_ranking:
+                this_index += float(ranking['super_bullish'])
+        
+        for aspect in self.whole_sign_houses['aspects']:
+            aspected_planet, aspecting_planet, aspect, orb, diff = aspect
+            # the api has a typo 'semi sqaure'
+            if aspect in aspects_ranking:
+                this_index += float(aspects_ranking[aspect])
+            else:
+                os.log_debug(f'Aspect {aspect} not found in aspects_ranking')
+        
+        # TODO: deal with houses, midheaven, vertex, lilith
+
+        return this_index
+
+
+    def _create_index_natal_chart(self) -> dict:
+        """Create index from natal chart."""
+
+        this_index = 0
+        houses_ranking = self.collective_intel['investing_houses']
+        aspects_ranking = self.general_intel['angle_aspects_ranking']
+        ranking = self.ranking
+
+        for planet in self.natal_chart['planets']:
+            planet, full_degree, norm_degree, speed, is_retrograde, sign, house = planet
+            if house in houses_ranking:
+                this_index += float(ranking['super_bullish'])
+        
+        for aspect in self.natal_chart['aspects']:
+            aspected_planet, aspecting_planet, aspect, orb, diff = aspect
+            # the api has a typo 'semi sqaure'
+            if aspect in aspects_ranking:
+                this_index += float(aspects_ranking[aspect])
+            else:
+                os.log_debug(f'Aspect {aspect} not found in aspects_ranking')
+
+
     #############################
     #       Public methods
     #############################
@@ -499,3 +844,155 @@ class Collective:
         this_index = self._create_index_transits_moon()
         os.log_info(f'Moon phases: {self.moon_phase}')
         os.log_info(f'Moon index: {this_index}')
+
+    
+    def get_transit_forecast(self) -> None:
+        """
+            Get transit forecast.
+
+            [{
+                    "name":"Sun",
+                    "fullDegree":330.41334722167386,
+                    "normDegree":0.4133472216738596,
+                    "speed":1.0082712955819473,
+                    "isRetro":"false",
+                    "sign":"Pisces",
+                    "house":6
+                },
+                {
+                    "name":"Moon",
+                    "fullDegree":114.14261905777207,
+                    "normDegree":24.142619057772066,
+                    "speed":12.96038356718529,
+                    "isRetro":"false",
+                    "sign":"Cancer",
+                    "house":10
+                },
+        """
+
+        os.log_info(f'Getting transit forecast...')
+        data = self._request_transits_forecast()
+
+        self._parse_data_transits_forecast(data)
+
+        this_index = self._create_index_transits_forecast()
+        os.log_info(f'Transit index: {this_index}')
+        
+
+    def get_wheel(self) -> None:
+        """Get wheel forecast."""
+
+        os.log_info(f'Getting wheel...')
+        data = self._request_wheel()
+
+        self._parse_data_wheel(data)
+    
+
+    def get_chart_data(self) -> None:
+        """
+            Get chart data.
+            This endpoint brings more aspects (e.g., quintile, semisextile).
+
+            {
+            "houses": [
+                {
+                    "start_degree": 138.21238,
+                    "end_degree": 165.28495,
+                    "sign": "Leo",
+                    "house_id": 1,
+                    "planets": []
+                },
+            "aspects": [
+                {
+                    "aspecting_planet": "Sun",
+                    "aspected_planet": "Moon",
+                    "aspecting_planet_id": 0,
+                    "aspected_planet_id": 1,
+                    "type": "Quincunx",
+                    "orb": 0.22,
+                    "diff": 149.78
+                },
+        
+        """
+
+        os.log_info(f'Getting chart data...')
+        data = self._request_chart_data()
+
+        self._parse_data_chart_data(data)
+
+        this_index = self._create_index_chart_data()
+        os.log_info(f'Chart data index: {this_index}')
+
+
+    def get_whole_sign_houses(self) -> None:
+        """
+            Get whole sign houses.
+            This endpoint brings vertex, midheaven, lilith
+            and can be set to whole sign.
+
+            {
+                "planets": [
+                    {
+                        "name": "Sun",
+                        "full_degree": 275.6427,
+                        "norm_degree": 5.6427,
+                        "speed": 1.019,
+                        "is_retro": "false",
+                        "sign_id": 10,
+                        "sign": "Capricorn",
+                        "house": 2
+                    },
+                "houses": [
+                    {
+                        "house": 1,
+                        "sign": "Sagittarius",
+                        "degree": 240.71431
+                    },
+                "ascendant": 240.71431015862024,
+                "midheaven": 156.92135925483103,
+                "vertex": 118.53668227404134,
+                "lilith": {
+                    "name": "Lilith",
+                    "full_degree": 134.6796,
+                    "norm_degree": 14.6796,
+                    "speed": 0.1113,
+                    "is_retro": "false",
+                    "sign_id": 5,
+                    "sign": "Leo",
+                    "house": 9
+                },
+                "aspects": [
+                    {
+                        "aspecting_planet": "Sun",
+                        "aspected_planet": "Mercury",
+                        "aspecting_planet_id": 0,
+                        "aspected_planet_id": 3,
+                        "type": "Conjunction",
+                        "orb": 2.66,
+                        "diff": 2.66
+                    },
+        """
+
+        os.log_info(f'Getting whole sign houses...')
+        data = self._request_whole_sign_houses()
+
+        self._parse_data_whole_sign_houses(data)
+
+        this_index = self._create_index_whole_sign_houses()
+        os.log_info(f'Whole sign houses index: {this_index}')
+
+
+    def get_natal_chart(self) -> None:
+        """
+            Get natal chart.
+            This endpoint brings vertex, midheaven, lilith,
+            plus a lot of other data (element analysis, moon phase, etc.).
+        """
+
+        os.log_info(f'Getting natal chart...')
+        data = self._request_natal_chart()
+
+        self._parse_data_natal_chart(data)
+
+        this_index = self._create_index_natal_chart()
+        os.log_info(f'Natal chart index: {this_index}')

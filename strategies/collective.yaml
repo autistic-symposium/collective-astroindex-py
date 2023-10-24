@@ -5,6 +5,7 @@
 super_bullish_planets:
   - 'jupiter'
   - 'venus'
+  - 'rahu'  # north node
 
 bullish_planets:
   - 'sun'
@@ -13,6 +14,7 @@ bullish_planets:
 super_bearish_planets:
   - 'saturn'
   - 'mars'
+  - 'ketu'  # south node
 
 unclear_planets:
   - 'pluto'

@@ -104,8 +104,11 @@ def get_timespace_dict(day=None, month=None, year=None, hour=None, mins=None, la
     }    
 
     
-def craft_request(env_vars, endpoint, data) -> dict:
+def craft_request(env_vars, endpoint, data, custom_data=None) -> dict:
     """Send request to a designed endpoint in the API."""
+
+    if custom_data:
+        data.update(custom_data)
 
     api_key = env_vars['API_KEY']
     usr_id = env_vars['USER_ID']
@@ -113,3 +116,5 @@ def craft_request(env_vars, endpoint, data) -> dict:
     os.log_debug(f'Requesting URL {url}')
 
     return send_request(url, data, auth=(usr_id, api_key))
+
+

@@ -18,10 +18,20 @@ def run_menu() -> argparse.ArgumentParser:
                         help='Forecast for the collective this month.')
     parser.add_argument('-cc', dest='collective_custom', action='store_true',
                         help='Forecast for the collective in a custom date range.')
-    parser.add_argument('-c', dest='collective', action='store_true',
-                        help='Forecast for the collective (all intel).')
     parser.add_argument('-m', dest='moon', action='store_true',
                         help='Moon phase.')
+    parser.add_argument('-c', dest='collective', action='store_true',
+                        help='Forecast for the collective (all intel).')
+    parser.add_argument('-t', dest='transit', action='store_true',
+                        help='Transit forecast.')
+    parser.add_argument('-w', dest='wheel', action='store_true',
+                        help='Wheel forecast.')
+    parser.add_argument('-cd', dest='chart_data', action='store_true',
+                        help='Chart data.') 
+    parser.add_argument('-ws', dest='whole_sign', action='store_true',
+                        help='Whole sign houses.')
+    parser.add_argument('-n', dest='natal', action='store_true',
+                        help='Natal chart.')
     return parser
 
 def run() -> None:
@@ -56,14 +66,38 @@ def run() -> None:
         if PRINT_PLOT:
             plot_collective(c.moon_phase, "Moon Phase")
     
+    elif args.transit:
+        c = Collective(env_vars)
+        c.get_transit_forecast()
+    
     elif args.collective:
         c = Collective(env_vars)
         c.get_collective_forecast_today()
         c.get_collective_forecast_monthly()
         c.get_collective_forecast_custom()
         c.get_collective_forecast_moon()
+        # TODO: how is this being added/used?
+        c.get_transit_forecast()
+        # TODO: add whole sign houses
         plot_collective(c.transit_index, "Collective Transit Index (all intel))")
         
+    elif args.wheel:
+        c = Collective(env_vars)
+        c.get_wheel()
+
+    elif args.chart_data:
+        c = Collective(env_vars)
+        c.get_chart_data()
+    
+    elif args.whole_sign:
+        c = Collective(env_vars)
+        c.get_whole_sign_houses()
+    
+    elif args.natal:
+        # TODO: this does not work
+        c = Collective(env_vars)
+        c.get_natal_chart()
+
     else:
         parser.print_help()
 
