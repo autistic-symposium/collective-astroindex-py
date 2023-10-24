@@ -13,11 +13,28 @@ class CollectiveIndex:
 
     def __init__(self, env_vars, city=None, country=None):
 
-        #######################
-        ### Load intel YAML ###
-        #######################
+        #####################
+        ### Load YAML intels
+        #####################
         self.env_vars = env_vars
-        self.sentiment_ranking, self.feature_ranking = self._load_ranking()
+        self.ranking = self._load_ranking()
+        
+        self.dignities_info = self._load_general_info('STRATEGIES_GENERAL', 'dignities')
+        
+        self.ascendant_intel = self._load_intel('STRATEGIES_COLLECTIVE', 'ascendant')
+        self.houses_intel = self._load_intel('STRATEGIES_COLLECTIVE', 'houses')
+        self.planet_intel = self._load_intel('STRATEGIES_COLLECTIVE', 'planets')
+        self.retrograde_intel = self._load_intel('STRATEGIES_COLLECTIVE', 'retrograde')
+        self.dignities_intel = self._load_intel('STRATEGIES_COLLECTIVE', 'dignities')
+
+
+        ######################
+        ### Create data dicts 
+        ######################
+        self.transit_daily = {t : [] for t in ['ascendant', 'houses', 'aspects']}
+
+
+
 
 
         self.api = aaw.AstrologyAPIWrapper(self.env_vars)
@@ -69,57 +86,62 @@ class CollectiveIndex:
 
         # TODO: move to a setup() func
 
-    ####################################
-    #   Private methods for Set Up
-    ####################################
+    ################################
+    #   Private methods: Set Up
+    ################################
+
     def _load_ranking(self) -> None:
-        """Load and parse ranking from YAML."""
 
         ranking = os.load_yaml(self.env_vars['STRATEGIES_RANKING'])
-        sentiment_ranking = {k: float(ranking['translation'][v]) for k, v in ranking['sentiments'].items()}
-        feature_ranking = {k: float(ranking['translation'][v]) for k, v in ranking['features'].items()}
+        return {k: float(ranking['translation'][v]) for k, v in ranking['sentiments'].items()}
 
-        return sentiment_ranking, feature_ranking
+    def _translate_ranking(self, intel: dict) -> dict:
+
+        return {k: float(self.ranking[v]) for k, v in intel.items()}
+
+    def _load_intel(self, intel_file, key: str) -> None:
+
+        intel = os.load_yaml(self.env_vars[intel_file])[key]
+        return self._translate_ranking(intel)
+
+    def _load_general_info(self, intel_file, key: str) -> None:
+
+        return os.load_yaml(self.env_vars[intel_file])[key]
 
 
-    ##################################################
-    #   Private methods for parsing the response data
-    ##################################################
+    ################################################
+    #   Private methods: Parsing the response data
+    ################################################
 
-    def _parse_data_transits_daily(self, data: dict) -> None:
-        """Parse data from transits daily."""
+    def _parse_transits_daily(self, data: dict) -> None:
 
-        ### Divide and save the data
-        self.ascendant_now = data['ascendant'].lower()
-        transit_house = data['transit_house']
-        transit_relation = data['transit_relation']
+        ### Parse the ascendant
+        self.transit_daily['ascendant'] = data['ascendant'].lower()
 
-        ### Parse the houses and planets
-        for obj in transit_house:
-            planet = obj['planet'].lower()
-            self.planets_now[planet] = obj['natal_sign'].lower()
-            self.houses_now[obj['transit_house']].append(planet)
-
-            if bool(obj['is_retrograde']):
-                self.retrogrades_now.append(planet)
-
-        ## Print the data
-        os.log_debug(f'Ascendant now: {self.ascendant_now}')
-        os.log_debug(f'Signs of planets now: {self.planets_now}')
-        os.log_debug(f'Planets in houses now: {self.houses_now}')
-        os.log_debug(f'Retrogrades now: {self.retrogrades_now}')
-
-        ### Get transits
-        for t in transit_relation:
-            planet1 = t['natal_planet'].lower()
-            planet2 = t['transit_planet'].lower()
-            transit_type = t['type'].lower()
-            orb = float(t['orb'])
-
-            if planet1 == planet2:
-                continue
+        ### Parse the houses
+        for feature in data['transit_house']:
+            planet = feature['planet'].lower()
+            sign = feature['natal_sign'].lower()
+            house = feature['transit_house']
+            is_retrograde = bool(feature['is_retrograde'])
             
-            self.transit_now[transit_type].append((planet1, planet2, orb))
+            self.transit_daily['houses'].append({'planet': planet,
+                                                'sign': sign,
+                                                'house': house,
+                                                'is_retrograde': is_retrograde})
+
+        ### Parse the transits
+        for transit in data['transit_relation']:
+            planet1 = transit['natal_planet'].lower()
+            planet2 = transit['transit_planet'].lower()
+            transit_type = transit['type'].lower()
+            orb = float(transit['orb'])
+
+            if planet1 != planet2:
+                self.transit_daily['aspects'].append({'planet1': planet1,
+                                                         'planet2': planet2,
+                                                         'transit_type': transit_type,
+                                                         'orb': orb})  
 
 
     def _parse_data_transits_monthly(self, data: dict) -> None:
@@ -399,17 +421,58 @@ class CollectiveIndex:
                 percentage = values['percentage']
 
 
-    ####################################################
-    #    Private methods for creating the index
-    ####################################################
+    #############################################
+    #    Private methods: Intel for indexes
+    #############################################
+
+    def _calculate_index_for_ascendant(self, ascendant) -> int:
+
+        return self.ascendant_intel[ascendant]
+
+    def _calculate_index_for_houses(self, houses) -> int:
+
+        index = 0
+
+        for item in houses:
+            house = item['house']
+            planet = item['planet']
+            sign = item['sign']
+            is_retrograde = item['is_retrograde']
+            
+            planet_index = self.planet_intel[planet]
+            retrograde_index = abs(self.retrograde_intel[is_retrograde])
+            house_index = abs(self.houses_intel[house])
+
+            if sign in self.dignities_info[planet]:
+                dignity_index = abs(self.dignities_intel[self.dignities_info[planet][sign]])
+            else:
+                dignity_index = 0
+            
+            index += planet_index * (retrograde_index + dignity_index + house_index)
+            
+        return index
+
+
+    #############################################
+    #    Private methods: Creating the indexes
+    #############################################
 
     def _create_index_transits_daily(self) -> int:
-        """Create index from transits daily."""
-        
-        index = 0
-    
-        ### Look at super bullish transits
 
+        ascendant = self.transit_daily['ascendant']
+        houses = self.transit_daily['houses']
+        aspects = self.transit_daily['aspects']
+
+        return self._calculate_index_for_ascendant(ascendant) + \
+               self._calculate_index_for_houses(houses) #+  
+                #self._calculate_index_for_aspects(aspects)
+    
+
+
+
+
+
+        '''
         super_bullish_planets = self.collective_intel['super_bullish_planets']
         investing_houses = self.collective_intel['investing_houses']
         planets_exaltation = self.general_intel['planets_exaltation']
@@ -480,7 +543,7 @@ class CollectiveIndex:
 
         ### Return the index
         return index
-
+    '''
 
     def _create_index_transits_monthly(self) -> dict:
         """Create index from transits monthly."""
@@ -657,13 +720,13 @@ class CollectiveIndex:
     def get_transits_daily(self) -> None:
 
         os.log_info(f'Getting transits daily...')
-        response = self.api.request_transits_daily()
 
-        self._parse_data_transits_daily(response)
+        response = self.api.request_transits_daily()
+        self._parse_transits_daily(response)
         this_index = self._create_index_transits_daily()
-        key = self.api.get_request_date()
-        self.collective_index[key] = this_index
-        os.log_info(f'Daily Index ({key}): {this_index}')
+        this_date = self.api.get_request_date()
+
+        os.log_info(f'Index I.a ({this_date}): {this_index}')
 
 
     def get_collective_transits_monthly(self) -> None:

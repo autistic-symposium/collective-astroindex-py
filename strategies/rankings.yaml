@@ -15,13 +15,11 @@ translation:
 
 sentiments:
   super_bullish: A
-  bullish: B
+  very_bullish: B
+  bullish: C
+  slightly_bullish: D
   neutral: E
-  unclear: E
-  bearish: H
+  slightly_bearish: F
+  bearish: G
+  very_bearish: H
   super_bearish: I
-
-features:
-  exalted_planet: D
-  retrograde_planet: G
-  detrimented_planet: F

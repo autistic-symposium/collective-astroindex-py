@@ -20,6 +20,7 @@ class AstrologyAPIWrapper:
 
     def _craft_request(self, endpoint, custom_data=None) -> dict:
 
+        self.retrieve_timespace()
         if custom_data:
             self.timespace.update(custom_data)
 
@@ -106,7 +107,6 @@ class AstrologyAPIWrapper:
         """
 
         endpoint = 'tropical_transits/daily'
-        self.retrieve_timespace()
         return self._craft_request(endpoint)
 
 
@@ -135,7 +135,6 @@ class AstrologyAPIWrapper:
         """
 
         endpoint = 'tropical_transits/monthly'
-        self.retrieve_timespace()
         return self._craft_request(endpoint)
 
 
@@ -165,7 +164,6 @@ class AstrologyAPIWrapper:
         """
 
         endpoint = 'natal_transits/daily'
-        self.retrieve_timespace()
         return self._craft_request(endpoint)
 
 
@@ -181,7 +179,6 @@ class AstrologyAPIWrapper:
         """
 
         endpoint = 'moon_phase_report'
-        self.retrieve_timespace()
         return self._craft_request(endpoint)
 
     
@@ -210,23 +207,13 @@ class AstrologyAPIWrapper:
         """
 
         endpoint = 'planets/tropical'
-        self.retrieve_timespace()
         return self._craft_request(endpoint)
 
     
     def request_natal_wheel(self) -> dict:
 
         endpoint = 'natal_wheel_chart'
-        self.retrieve_timespace()
-        custom_data = {
-            'planet_icon_color': '#F57C00',
-            'inner_circle_background': '#FFF8E1',
-            'sign_icon_color': 'red',
-            'sign_background': '#ffffff',
-            'chart_size': '500',
-            'image_type': 'png'
-        }
-        return self._craft_request(endpoint, custom_data)
+        return self._craft_request(endpoint)
 
 
     def request_chart_data(self) -> dict:
@@ -256,7 +243,6 @@ class AstrologyAPIWrapper:
         """
 
         endpoint = 'western_chart_data'
-        self.retrieve_timespace()
         return self._craft_request(endpoint, custom_data)
 
 
@@ -307,6 +293,4 @@ class AstrologyAPIWrapper:
         """
 
         endpoint = 'western_horoscope'
-        self.retrieve_timespace()
         return self._craft_request(endpoint)
-

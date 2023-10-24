@@ -11,7 +11,7 @@ from src.intel.collective import CollectiveIndex
 
 def run_menu() -> argparse.ArgumentParser:
 
-    parser = argparse.ArgumentParser(description='✨ Choices ✨')
+    parser = argparse.ArgumentParser(description='✨ AstroIDX I: Collective ✨')
     parser.add_argument('-ct', dest='collective_today', action='store_true',
                         help='Forecast for the collective today.')
     parser.add_argument('-cm', dest='collective_monthly', action='store_true',

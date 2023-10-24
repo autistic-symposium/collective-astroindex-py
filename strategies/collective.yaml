@@ -40,3 +40,67 @@ other_houses:
   - 7
   - 12
 
+planets:
+  exalted_planet: 
+  retrograde_planet: G
+  detrimented_planet: F
+
+
+
+
+
+
+ascendant:
+  aries: slightly_bullish        # 5th house leo, 8th house scorpio
+  taurus: slightly_bullish       # 5th house virgo, 8th house sagittarius
+  gemini: neutral                # 5th house libra, 8th house capricorn
+  cancer: slightly_bullish       # 5th house scorpio, 8th house aquarius
+  leo: neutral                   # 5th house sagittarius, 8th house pisces
+  virgo: neutral                 # 5th house capricorn, 8th house aries
+  libra: neutral                 # 5th house aquarius, 8th house taurus
+  scorpio: slightly_bearish      # 5th house pisces, 8th house gemini
+  sagittarius: neutral           # 5th house aries, 8th house cancer
+  capricorn: neutral             # 5th house taurus, 8th house leo
+  aquarius: slightly_bullish     # 5th house gemini, 8th house virgo
+  pisces: slightly_bearish       # 5th house cancer, 8th house libra
+
+houses:
+  1: neutral
+  2: slightly_bullish
+  3: neutral
+  4: neutral
+  5: super_bullish
+  6: slightly_bearish
+  7: neutral
+  8: super_bullish
+  9: slightly_bullish
+  10: slightly_bullish
+  11: slightly_bullish
+  12: slightly_bearish
+
+planets:
+  sun: neutral
+  moon: neutral
+  mercury: neutral
+  venus: super_bullish
+  mars: super_bearish
+  jupiter: super_bullish
+  saturn: super_bearish
+  uranus: neutral
+  neptune: neutral
+  pluto: neutral
+  rahu: super_bullish
+  ketu: super_bearish
+
+retrograde:
+  true: slightly_bullish   
+  false: very_bearish            
+
+dignities:
+  exalted: super_bullish
+  detriment: super_bearish
+  fall: super_bearish
+  triplicity: neutral
+  term: neutral
+  face: neutral
+  peregrine: neutral
