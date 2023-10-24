@@ -18,7 +18,13 @@ def send_request(url: str, data=None, auth=None, params=None) -> dict:
     if not params:
         params = {'header': 'Content-Type: application/json'}
     try:
+        print(f'URL: {url}')
+        print(f'Data: {data}')
+        print(f'Auth: {auth}')
+        print(f'Params: {params}')
         r = requests.post(url, data=data, auth=auth, params=params)
+        print(f'Response: {r}')
+        
 
     except requests.exceptions.HTTPError as e:
         raise Exception(f'{url}: {e.response.text}')
@@ -28,16 +34,17 @@ def send_request(url: str, data=None, auth=None, params=None) -> dict:
         os.log_error(f'Query failed: HTTP code {r.status_code}')
 
 
+def get_city_and_country_from_ip() -> tuple:
+    """Get city and country from user IP."""
+
+    location = geocoder.ip('me')
+    return location.city, location.country
+
+
 def get_lat_and_lon_at_given_city(city: str, country: str) -> tuple:
     """Get latitude and longitude from a city and country."""
 
-    if not city or not country:
-        os.log_info('No city or country provided. Using user IP location.')
-
-        location = geocoder.ip('me')
-    else:
-        location = geocoder.osm(f'{city}, {country}')
-
+    location = geocoder.osm(f'{city}, {country}')
     return (location.lat, location.lng)
 
 

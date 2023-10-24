@@ -137,8 +137,7 @@ class CollectiveIndex:
             transit_type = aspect['type'].lower()
             orb = float(aspect['orb'])
 
-            if planet1 != planet2:
-                self.transit_daily['aspects'].append({'planet1': planet1,
+            self.transit_daily['aspects'].append({'planet1': planet1,
                                                          'planet2': planet2,
                                                          'transit_type': transit_type,
                                                          'orb': orb})  
@@ -147,7 +146,14 @@ class CollectiveIndex:
     def _parse_transits_monthly(self, data: dict) -> None:
 
         for aspect in data['transit_relation']:
-            pass
+            planet1 = aspect['natal_planet'].lower()
+            planet2 = aspect['transit_planet'].lower()
+            transit_type = aspect['type'].lower()
+            orb = float(aspect['orb'])
+            date = aspect['date']
+
+      
+
         
         for moon_phase in data['moon_phase']:
             pass

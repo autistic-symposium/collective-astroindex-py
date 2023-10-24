@@ -18,11 +18,38 @@ class AstrologyAPIWrapper:
     #       Private methods     #
     #############################
 
-    def _craft_request(self, endpoint, custom_data=None) -> dict:
+    def _retrieve_timespace(self, data) -> dict:
 
-        self.retrieve_timespace()
-        if custom_data:
-            self.timespace.update(custom_data)
+        if not 'city' in data or not 'country' in data:
+            data['city'], data['country'] = net.get_city_and_country_from_ip()
+                                 
+        if not 'lat' in data or not 'lon' in data:
+            data['lat'], data['lon'] = \
+                            net.get_lat_and_lon_at_given_city(data['city'], data['country'])
+        os.log_debug(f'Using coordinates {data["lat"]}, {data["lon"]}')
+
+        if not 'tzone' in data:
+            data['tzone_name'], data['tzone'] = \
+                            net.get_timezone_offset_at_given_location(data['lat'], data['lon'])
+            os.log_debug(f'Using timezone {data["tzone_name"]} with offset {data["tzone"]}')
+
+        if not 'day' in data or \
+           not 'month' in data or \
+           not 'year' in data or \
+           not 'hour' in data or \
+           not 'mins' in data:
+                data['day'], data['month'], data['year'], data['hour'], data['mins'] = \
+                            net.get_datetime_now_at_given_timezone(data['tzone_name'])
+        os.log_debug(f'Date {data["day"]}-{data["month"]}-{data["year"]} {data["hour"]}:{data["mins"]}')
+
+        data['house_system'] = 'whole_sign'
+        self.timespace = data 
+
+
+    def _craft_request(self, endpoint, data=None) -> dict:
+
+        data = {} if not data else data
+        self._retrieve_timespace(data)
 
         api_key = self.env_vars['API_KEY']
         usr_id = self.env_vars['USER_ID']
@@ -35,42 +62,6 @@ class AstrologyAPIWrapper:
     #############################  
     #  Public methods: General  #
     #############################
-
-    def retrieve_timespace(self, day=None, 
-                                 month=None, 
-                                 year=None, 
-                                 hour=None, 
-                                 mins=None, 
-                                 lat=None, 
-                                 lon=None, 
-                                 tzone=None, 
-                                 city=None, 
-                                 country=None) -> dict:
-                                 
-        if not lat or not lon:
-            lat, lon = net.get_lat_and_lon_at_given_city(city, country)
-        os.log_debug(f'Using coordinates {lat}, {lon}')
-
-        if not tzone:
-            tzone_name, tzone = net.get_timezone_offset_at_given_location(lat, lon)
-            os.log_debug(f'Using timezone {tzone}')
-
-        if not day or not month or not year or not hour or not mins:
-            day, month, year, hour, mins = net.get_datetime_now_at_given_timezone(tzone_name)
-        os.log_debug(f'Using date {day}/{month}/{year} {hour}:{mins}')
-
-        self.timespace = {
-            'day': day,
-            'month': month,
-            'year': year,
-            'hour': hour,
-            'min': mins,
-            'lat': lat,
-            'lon': lon,
-            'tzone': tzone,
-            'tzone_name': tzone_name
-        }  
-
     
     def get_request_date(self) -> dict:
 
@@ -82,7 +73,7 @@ class AstrologyAPIWrapper:
     #  Public methods: Endpoints  #
     #############################
 
-    def request_transits_daily(self) -> dict:
+    def request_transits_daily(self, data=None) -> dict:
         """   Response example:
             {
             "transit_date": "17-6-2017",
@@ -107,10 +98,10 @@ class AstrologyAPIWrapper:
         """
 
         endpoint = 'tropical_transits/daily'
-        return self._craft_request(endpoint)
+        return self._craft_request(endpoint, data)
 
 
-    def request_transits_monthly(self) -> dict:
+    def request_transits_monthly(self, data=None) -> dict:
         """    Response example:
             {
                 "month_start_date": "1-6-2017",
@@ -135,10 +126,10 @@ class AstrologyAPIWrapper:
         """
 
         endpoint = 'tropical_transits/monthly'
-        return self._craft_request(endpoint)
+        return self._craft_request(endpoint, data)
 
 
-    def request_transits_natal_daily(self) -> dict:
+    def request_transits_natal_daily(self, data=None) -> dict:
         """ 
             Response example:
 
@@ -164,10 +155,10 @@ class AstrologyAPIWrapper:
         """
 
         endpoint = 'natal_transits/daily'
-        return self._craft_request(endpoint)
+        return self._craft_request(endpoint, data)
 
 
-    def request_moon_phase(self) -> dict:
+    def request_moon_phase(self, data=None) -> dict:
         """ 
             Response example:
 
@@ -179,10 +170,10 @@ class AstrologyAPIWrapper:
         """
 
         endpoint = 'moon_phase_report'
-        return self._craft_request(endpoint)
+        return self._craft_request(endpoint, data)
 
     
-    def request_planet_tropical(self) -> dict:
+    def request_planet_tropical(self, data=None) -> dict:
         """
             Response example:
 
@@ -207,16 +198,24 @@ class AstrologyAPIWrapper:
         """
 
         endpoint = 'planets/tropical'
-        return self._craft_request(endpoint)
+        return self._craft_request(endpoint, data)
 
     
-    def request_natal_wheel(self) -> dict:
+    def request_natal_wheel(self, data=None) -> dict:
+        """
+            Response example:
+                        {
+                "status": true,
+                "chart_url": "https://s3.ap-south-1"
+                "msg": "Chart created successfully!"
+            }
+        """
 
         endpoint = 'natal_wheel_chart'
-        return self._craft_request(endpoint)
+        return self._craft_request(endpoint, data)
 
 
-    def request_chart_data(self) -> dict:
+    def request_chart_data(self, data=None) -> dict:
         """
             Response example:
 
@@ -243,10 +242,10 @@ class AstrologyAPIWrapper:
         """
 
         endpoint = 'western_chart_data'
-        return self._craft_request(endpoint, custom_data)
+        return self._craft_request(endpoint, data)
 
 
-    def request_western_horoscope(self) -> dict:
+    def request_western_horoscope(self, data=None) -> dict:
         """
             Response example:
             {
@@ -293,4 +292,4 @@ class AstrologyAPIWrapper:
         """
 
         endpoint = 'western_horoscope'
-        return self._craft_request(endpoint)
+        return self._craft_request(endpoint, data)
