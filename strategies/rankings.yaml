@@ -1,0 +1,25 @@
+# Ranking used to calculate the astro index, which is
+# used to determine the overall market sentiment.
+# These values are experimental and not normalized.
+
+translation:
+  A: 10
+  B: 5
+  C: 3
+  D: 1
+  E: 0
+  F: -1
+  G: -3
+  H: -5
+  I: -10
+
+sentiments:
+  super_bullish: A
+  very_bullish: B
+  bullish: C
+  slightly_bullish: D
+  neutral: E
+  slightly_bearish: F
+  bearish: G
+  very_bearish: H
+  super_bearish: I

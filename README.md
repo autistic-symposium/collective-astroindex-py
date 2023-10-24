@@ -4,6 +4,8 @@
 
 TODO: clean up this README
 
+https://astrologyapi.com/docs/api-ref
+
 <br>
 
 ## install
@@ -112,3 +114,4 @@ https://json.astrologyapi.com:443 "POST /v1/tropical_transits/daily?header=Conte
 * graphs from https://cafeastrology.com/businessromancegraphs.html 
 
 
+TODO ADD ANGLES for exataltation

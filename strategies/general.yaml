@@ -1,4 +1,63 @@
-# this is a overall list of features that are used in the strategies
+# this is a overall list of features that are used so that we
+# can define specific strategies in the next yaml files
+
+
+dignities:
+  'sun': 
+    'aries': 'exalted'
+    'leo': 'domicile'
+    'libra': 'detriment'
+    'aquarius': 'fall'
+  'moon':
+    'taurus': 'exalted'
+    'cancer': 'domicile'
+    'scorpio': 'detriment'
+    'capricorn': 'fall'
+  'mercury':
+    'virgo': 'exalted'
+    'gemini': 'domicile'
+    'sagittarius': 'detriment'
+    'pisces': 'fall'
+  'venus':
+    'pisces': 'exalted'
+    'taurus': 'domicile'
+    'scorpio': 'detriment'
+    'virgo': 'fall'
+  'mars':
+    'capricorn': 'exalted'
+    'aries': 'domicile'
+    'libra': 'detriment'
+    'cancer': 'fall'
+  'jupiter':
+    'cancer': 'exalted'
+    'sagittarius': 'domicile'
+    'capricorn': 'detriment'
+    'gemini': 'fall'
+  'saturn':
+    'libra': 'exalted'
+    'aquarius': 'domicile'
+    'aries': 'detriment'
+    'cancer': 'fall'
+  'uranus':
+    'scorpio': 'exalted'
+    'aquarius': 'domicile'
+    'leo': 'detriment'
+    'taurus': 'fall'
+  'neptune':
+    'pisces': 'exalted'
+    'aquarius': 'domicile'
+    'virgo': 'detriment'
+    'gemini': 'fall'
+  'pluto':
+    'scorpio': 'exalted'
+    'pisces': 'domicile'
+    'taurus': 'detriment'
+    'virgo': 'fall'
+  'rahu':
+    'gemini': 'exalted'
+  'ketu':
+    'sagittarius': 'exalted'
+
 
 houses_by_element:
   1: 'fire'
@@ -12,6 +71,7 @@ houses_by_element:
   10: 'earth'
   11: 'air'
   12: 'water'
+
 
 signs_by_element:
   'aries': fire
@@ -27,6 +87,7 @@ signs_by_element:
   'aquarius': air
   'pisces': water
 
+
 houses_by_sign:
   1: 'aries'
   2: 'taurus'
@@ -41,70 +102,43 @@ houses_by_sign:
   11: 'aquarius'
   12: 'pisces'
 
-# TODO: fix this https://astrostyle.com/astrology/essential-dignities/, 
-# https://en.wikipedia.org/wiki/Exaltation_(astrology)
-planets_exaltation:
-  'sun': ['aries', 'leo']
-  'moon': ['taurus', 'cancer']
-  'mercury': ['virgo', 'gemini']
-  'venus': ['libra', 'taurus', 'pisces']
-  'mars': ['capricorn', 'scorpio', 'aries']
-  'jupiter': ['pisces', 'sagittarius']
-  'saturn': ['aquarius', 'capricorn', 'libra']
-  'uranus': ['aquarius', 'scorpio']
-  'neptune': ['pisces', 'leo']
-  'pluto': ['scorpio', 'aries']
 
-planets_detriment:
-  'sun': ['aquarius', 'libra']
-  'moon': ['scorpio', 'capricorn']
-  'mercury': ['pisces', 'sagittarius']
-  'venus': ['virgo', 'scorpio', 'aries']
-  'mars': ['cancer', 'taurus', 'libra']
-  'jupiter': ['gemini', 'virgo']
-  'saturn': ['cancer', 'aries']
-  'uranus': ['leo']
-  'neptune': ['virgo']
-  'pluto': ['taurus', 'libra', 'leo']
-
-# TODO: fix this https://en.wikipedia.org/wiki/Exaltation_(astrology)
-angles_exaltation:
-  'sun': [19, 10]
-  'moon': 3
-  'mercury': 15
-  'venus': 27
-  'mars': 28
-  'jupiter': [5, 15]
-  'saturn': [21, 20]
-  'nnode': 3
-
-angles_detriment:
-  'sun': [19, 10]
-  'moon': 3
-  'mercury': 15
-  'venus': 27
-  'mars': 28
-  'jupiter': [5, 15]
-  'saturn': [21, 20]
-
-# TODO: add support to other aspects
-angles_aspects:
+aspects:
   'conjunction': 0
   'opposition': 180
   'trine': 120
   'square': 90
   'sextile': 60
+  'quincunx': 150
+  'semisextile': 30
+  'semisquare': 45
+  'quintile': 72
+  'sesquiquadrate': 135
+  'biquintile': 144
+  'semisquare': 45
+  'novile': 40
+  'binovile': 80
+  'triseptile': 154
+  'quintile': 72
+  'septile': 51.42857142857143
+  'biseptile': 102.85714285714286
+  'triseptile': 154.28571428571428
 
-angle_aspects_ranking:
-  'conjunction': 10
-  'opposition': -8
-  'trine': 5
-  'square': -5
-  'sextile': 5
-  'quincunx': -3
-  'semi sextile': 3
-  'semi square': -3
-  'quintile': 3
 
-
-
+dignities_by_angles:
+  'sun':
+    - 19: 'exalted'
+  'moon':
+    - 3: 'exalted'
+  'mercury':
+    - 15: 'exalted'
+  'venus':
+    - 27: 'exalted'
+  'mars':
+    - 28: 'exalted'
+  'jupiter':
+    - 15: 'exalted'
+  'saturn':
+    - 21: 'exalted'
+  'rahu':
+    - 3: 'exalted'
