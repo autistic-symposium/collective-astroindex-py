@@ -5,7 +5,7 @@
 from datetime import timedelta, datetime
 
 import src.utils.os as os
-import src.utils.net as net
+import src.utils.network as net
 import src.datalake.astro_api_wrapper as aaw
 
 
@@ -162,7 +162,7 @@ class CollectiveIndex:
 
 
 
-    def _parse_data_transits_daily_custom(self, data: dict) -> None:
+    def _parse_transits_natal_daily(self, data: dict) -> None:
         """Parse data from custom transits daily."""
 
         ### Divide and save the data
@@ -215,7 +215,7 @@ class CollectiveIndex:
                 self.transit_now_custom[this_date] = [this_value]
 
 
-    def _parse_data_transits_moon(self, data: dict) -> None:
+    def _parse_moon_phase(self, data: dict) -> None:
         """Parse data from moon phase."""
 
         self.moon_phase[data['considered_date']] = data['moon_phase']
@@ -225,7 +225,7 @@ class CollectiveIndex:
         print(f'Significance: {significance}')
 
 
-    def _parse_data_transits_forecast(self, data: dict) -> None:
+    def _parse_planet_tropical(self, data: dict) -> None:
         """ Parse data from transit forecast."""
 
         for obj in data:
@@ -243,7 +243,7 @@ class CollectiveIndex:
             self.transit_forecast[planet] = [full_degree, norm_degree, speed, is_retrograde, sign, house]
             
 
-    def _parse_data_wheel(self, data: dict) -> None:
+    def _parse_natal_wheel(self, data: dict) -> None:
         """Parse data from wheel."""
 
         if data['status'] == True:
@@ -251,7 +251,7 @@ class CollectiveIndex:
             os.log_info(f'Wheel created: {url}')
 
 
-    def _parse_data_chart_data(self, data: dict) -> None:
+    def _parse_chart_data(self, data: dict) -> None:
         """Parse data from chart data."""
 
         for key, values in data.items():
@@ -276,7 +276,7 @@ class CollectiveIndex:
 
                     self.chart_data['aspects'].append((aspected_planet, aspecting_planet, aspect, orb, diff))
 
-    def _parse_data_whole_sign_houses(self, data: dict) -> None:
+    def _parse_western_horoscope(self, data: dict) -> None:
         """Parse data from whole sign houses."""
 
         for key, values in data.items():
@@ -329,75 +329,6 @@ class CollectiveIndex:
                     diff = value['diff']
 
                     self.whole_sign_houses['aspects'].append((aspected_planet, aspecting_planet, aspect, orb, diff))
-
-
-    def _parse_data_natal_chart(self, data: dict) -> None:
-        """Parse data from natal chart."""
-
-        for key, values in data.items():
-
-            if key == 'planets':
-                for value in values:
-                    planet = value['name']
-                    full_degree = value['full_degree']
-                    norm_degree = value['norm_degree']
-                    speed = value['speed']
-                    is_retrograde = value['is_retro']
-                    sign = value['sign'].lower()
-                    house = value['house']
-
-                    self.natal_chart['planets'].append((planet, full_degree, norm_degree, speed, is_retrograde, sign, house))
-
-            elif key == 'houses':
-                for value in values:
-                    house = value['house']
-                    sign = value['sign'].lower()
-                    degree = value['degree']
-
-                    self.natal_chart['houses'].append((house, sign, degree))
-            
-            elif key == 'ascendant' or key == 'vertex' or key == 'midheaven':
-                self.natal_chart[key] = values
-            
-            elif key == 'lilith':
-                full_degree = values['full_degree']
-                norm_degree = values['norm_degree']
-                speed = values['speed']
-                is_retrograde = values['is_retro']
-                sign = values['sign'].lower()
-                house = values['house']
-
-                self.natal_chart['lilith'] = (full_degree, norm_degree, speed, is_retrograde, sign, house)
-
-            elif key == 'aspects':
-                for value in values:
-                    aspecting_planet = value['aspecting_planet'].lower()
-                    aspected_planet = value['aspected_planet'].lower()
-                    aspect = value['type'].lower()
-                    orb = value['orb']
-                    diff = value['diff']
-
-                    self.natal_chart['aspects'].append((aspected_planet, aspecting_planet, aspect, orb, diff))
-
-            elif key == 'moon_phase':
-                moon_phase_name = values['moon_phase_name']
-                self.natal_chart['moon_phase'].append(moon_phase_name)
-
-            elif key == 'elements':
-                for value in values['elements']:
-                    name = value['name']
-                    percentage = value['percentage']
-                    self.natal_chart['elements'].append((name, percentage))
-
-            elif key == 'modes':
-                for value in values['modes']:
-                    name = value['name']
-                    percentage = value['percentage']
-                    self.natal_chart['modes'].append((name, percentage))
-            
-            elif key == 'dominant_signs':
-                sign = values['sign_name']
-                percentage = values['percentage']
 
 
     #############################################
@@ -486,7 +417,7 @@ class CollectiveIndex:
                 self.transit_index[date] += index_here
 
     
-    def _create_index_transits_daily_custom(self) -> dict:
+    def _create_transits_natal_daily(self) -> dict:
         """Create index from custom transits daily."""
 
         for date, data in self.transit_now_custom.items():
@@ -519,7 +450,7 @@ class CollectiveIndex:
                         self.transit_index[date] -= float(self.sentiment_ranking['bearish'])
 
 
-    def _create_index_transits_moon(self) -> dict:
+    def _create_index_moon_phase(self) -> dict:
         """Create index from moon phase."""
 
         this_index = 0
@@ -538,7 +469,7 @@ class CollectiveIndex:
         return this_index
 
 
-    def _create_index_transits_forecast(self) -> dict:
+    def _create_index_planet_tropical(self) -> dict:
         """Create index from transit forecast."""
 
         this_index = 0
@@ -588,7 +519,7 @@ class CollectiveIndex:
         return this_index
 
 
-    def _create_index_whole_sign_houses(self) -> dict:
+    def _create_index_western_horoscope(self) -> dict:
         """Create index from whole sign houses."""
 
         this_index = 0
@@ -611,27 +542,6 @@ class CollectiveIndex:
         # TODO: deal with houses, midheaven, vertex, lilith
 
         return this_index
-
-
-    def _create_index_natal_chart(self) -> dict:
-        """Create index from natal chart."""
-
-        this_index = 0
-        houses_ranking = self.collective_intel['investing_houses']
-        aspects_ranking = self.general_intel['angle_aspects_ranking']
-
-        for planet in self.natal_chart['planets']:
-            planet, full_degree, norm_degree, speed, is_retrograde, sign, house = planet
-            if house in houses_ranking:
-                this_index += float(self.sentiment_ranking['super_bullish'])
-        
-        for aspect in self.natal_chart['aspects']:
-            aspected_planet, aspecting_planet, aspect, orb, diff = aspect
-            # the api has a typo 'semi sqaure'
-            if aspect in aspects_ranking:
-                this_index += float(aspects_ranking[aspect])
-            else:
-                os.log_debug(f'Aspect {aspect} not found in aspects_ranking')
 
 
     #############################

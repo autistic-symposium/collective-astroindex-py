@@ -3,7 +3,7 @@
 
 
 import src.utils.os as os
-import src.utils.net as net
+import src.utils.network as net
 
 
 class AstrologyAPIWrapper:
