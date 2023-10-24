@@ -1,17 +1,30 @@
 # -*- encoding: utf-8 -*-
 # src/intel/collective.py
 
-from datetime import timedelta, date, datetime
+#TODO: move to utils
+from datetime import timedelta, datetime
 
 import src.utils.os as os
 import src.utils.net as net
 
 
-class Collective:
+class CollectiveIndex:
 
     def __init__(self, env_vars, city=None, country=None):
 
+        #######################
+        ### Load intel YAML ###
+        #######################
         self.env_vars = env_vars
+        self.sentiment_ranking, self.feature_ranking = self._load_ranking()
+
+
+        # TODO: clean this up
+        self.collective_intel = os.load_yaml(self.env_vars['STRATEGIES_COLLECTIVE'])
+        self.general_intel = os.load_yaml(self.env_vars['STRATEGIES_GENERAL'])
+        self.moon_intel = os.load_yaml(self.env_vars['STRATEGIES_MOON'])
+
+        
         self.collective_index = {}
         self.location = (city, country)
         self.timespace = net.get_timespace_dict(self.location)
@@ -52,96 +65,20 @@ class Collective:
                         }
 
         self.transit_index = {}
-        self.ranking = self._get_ranking_scale()
 
         # TODO: move to a setup() func
-        self.collective_intel = os.load_yaml(self.env_vars['STRATEGIES_COLLECTIVE'])
-        self.general_intel = os.load_yaml(self.env_vars['STRATEGIES_GENERAL'])
-        self.moon_intel = os.load_yaml(self.env_vars['STRATEGIES_MOON'])
 
+    ####################################
+    #   Private methods for Set Up
+    ####################################
+    def _load_ranking(self) -> None:
+        """Load and parse ranking from YAML."""
 
-    ####################################################
-    #   Private methods for requesting from astro API
-    ####################################################
-    def _get_ranking_scale(self) -> dict:
-        """Get ranking scale."""
-    
-        return os.load_yaml(self.env_vars['STRATEGIES_RANKING'])
-        
+        ranking = os.load_yaml(self.env_vars['STRATEGIES_RANKING'])
+        sentiment_ranking = {k: float(ranking['translation'][v]) for k, v in ranking['sentiments'].items()}
+        feature_ranking = {k: float(ranking['translation'][v]) for k, v in ranking['features'].items()}
 
-    def _request_transits_daily(self) -> dict:
-        """Request transits daily from API."""
-
-        endpoint = 'tropical_transits/daily'
-        return net.craft_request(self.env_vars, endpoint, self.timespace)
-
-
-    def _request_transits_monthly(self) -> dict:
-        """Request transits monthly from API."""
-
-        endpoint = 'tropical_transits/monthly'
-        return net.craft_request(self.env_vars, endpoint, self.timespace)
-
-
-    def _request_transits_custom_daily(self) -> dict:
-        """Request custom transits daily from API."""
-
-        endpoint = 'natal_transits/daily'
-        return net.craft_request(self.env_vars, endpoint, self.timespace)
-
-
-    def  _request_transits_moon(self) -> dict:
-        """Request moon phase from API."""
-
-        endpoint = 'moon_phase_report'
-        return net.craft_request(self.env_vars, endpoint, self.timespace)
-
-    
-    def _request_transits_forecast(self) -> dict:
-        """Request transits forecast from API."""
-
-        endpoint = 'planets/tropical'
-        return net.craft_request(self.env_vars, endpoint, self.timespace)
-
-    
-    def _request_wheel(self) -> dict:
-        """Request wheel from API."""
-
-        endpoint = 'natal_wheel_chart'
-        custom_data = {
-            'planet_icon_color': '#F57C00',
-            'inner_circle_background': '#FFF8E1',
-            'sign_icon_color': 'red',
-            'sign_background': '#ffffff',
-            'chart_size': '500',
-            'image_type': 'png',
-        }
-        return net.craft_request(self.env_vars, endpoint, self.timespace, custom_data)
-
-
-    def _request_chart_data(self) -> dict:
-        """Request chart data from API."""
-
-        endpoint = 'western_chart_data'
-        return net.craft_request(self.env_vars, endpoint, self.timespace)
-
-    
-    def _request_whole_sign_houses(self) -> dict:
-        """Request whole sign houses from API."""
-
-        endpoint = 'western_horoscope'
-        # TODO: which one is the one?
-        custom_data = {
-            'system': 'whole_sign',
-            'house_system': 'whole_sign',
-        }
-        return net.craft_request(self.env_vars, endpoint, self.timespace, custom_data)
-
-    def _request_natal_chart(self) -> dict:
-        """Request natal chart from API."""
-
-        endpoint = 'natal_chart_interpretation'
-        return net.craft_request(self.env_vars, endpoint, self.timespace)
+        return sentiment_ranking, feature_ranking
 
 
     ##################################################
@@ -480,16 +417,16 @@ class Collective:
             
             if self.planets_now[planet] in planets_exaltation:
                 os.log_debug(f'{planet} is exalted in {self.planets_now[planet]}')
-                index += float(self.ranking['exalted'])
+                index += float(self.feature_ranking['exalted_planet'])
             
             if planet in self.retrogrades_now:
                 os.log_debug(f'{planet} is retrograde')
-                index -= float(self.ranking['retrograde'])
+                index -= float(self.feature_ranking['retrograde_planet'])
             
             for house in investing_houses:
                 if planet in self.houses_now[house]:
                     os.log_debug(f'{planet} is in house {house}')
-                    index += float(self.ranking['super_bullish'])
+                    index += float(self.sentiment_ranking['super_bullish'])
 
         ### Look at bullish transits
 
@@ -499,16 +436,16 @@ class Collective:
             
             if self.planets_now[planet] in planets_exaltation:
                 os.log_debug(f'{planet} is exalted in {self.planets_now[planet]}')
-                index += float(self.ranking['exalted'])
+                index += float(self.feature_ranking['exalted_planet'])
             
             if planet in self.retrogrades_now:
                 os.log_debug(f'{planet} is retrograde')
-                index -= float(self.ranking['retrograde'])
+                index -= float(self.feature_ranking['retrograde_planet'])
             
             for house in investing_houses:
                 if planet in self.houses_now[house]:
                     os.log_debug(f'{planet} is in house {house}')
-                    index += float(self.ranking['bullish'])
+                    index += float(self.sentiment_ranking['bullish'])
 
             # TODO: add angles in exaltation
             # TODO: add path of fortune in exaltation
@@ -522,21 +459,21 @@ class Collective:
             
             if self.planets_now[planet] in planets_exaltation:
                 os.log_debug(f'{planet} is exalted in {self.planets_now[planet]}')
-                index -= float(self.ranking['detriment'])
+                index -= float(self.feature_ranking['detriment_planet'])
             
             if planet in self.retrogrades_now:
                 os.log_debug(f'{planet} is retrograde')
-                index -= float(self.ranking['retrograde'])
+                index -= float(self.feature_ranking['retrograde_planet'])
             
             for house in investing_houses:
                 if planet in self.houses_now[house]:
                     os.log_debug(f'{planet} is in house {house}')
-                    index -= float(self.ranking['bearish'])
+                    index -= float(self.sentiment_ranking['bearis_planet'])
             
             for house in bearish_houses:
                 if planet in self.houses_now[house]:
                     os.log_debug(f'{planet} is in house {house}')
-                    index -= float(self.ranking['super_bearish'])
+                    index -= float(self.sentiment_ranking['super_bearish'])
 
             # TODO: add angles in detriment
 
@@ -580,21 +517,21 @@ class Collective:
                     continue
                 
                 if is_retrograde:
-                    self.transit_index[date] -= float(self.ranking['retrograde'])
+                    self.transit_index[date] -= float(self.feature_ranking['retrograde_planet'])
                 
                 if sign in planets_exaltation[planet2]:
-                    self.transit_index[date] += float(self.ranking['exalted'])
+                    self.transit_index[date] += float(self.feature_ranking['exalted_planet'])
                     if house in investing_houses:
-                        self.transit_index[date] += float(self.ranking['super_bullish'])
+                        self.transit_index[date] += float(self.sentiment_ranking['super_bullish'])
                 elif sign in planets_detriment[planet2]:
-                    self.transit_index[date] -= float(self.ranking['detriment'])
+                    self.transit_index[date] -= float(self.feature_ranking['detriment_planet'])
                     if house in investing_houses:
-                        self.transit_index[date] -= float(self.ranking['super_bearish'])
+                        self.transit_index[date] -= float(self.sentiment_ranking['super_bearish'])
                 else:
                     if house in investing_houses:
-                        self.transit_index[date] += float(self.ranking['bullish'])
+                        self.transit_index[date] += float(self.sentiment_ranking['bullish'])
                     else:
-                        self.transit_index[date] -= float(self.ranking['bearish'])
+                        self.transit_index[date] -= float(self.sentiment_ranking['bearish'])
 
 
     def _create_index_transits_moon(self) -> dict:
@@ -605,7 +542,8 @@ class Collective:
 
         for date, phase in self.moon_phase.items():
             this_ranking = moon_phases_ranking[phase]
-            this_index += float(self.ranking[this_ranking])
+            # TODO: fix this
+            #this_index += float(self.ranking[this_ranking])
 
         if date in self.transit_index:
             self.transit_index[date] += this_index
@@ -627,16 +565,16 @@ class Collective:
             full_degree, norm_degree, speed, is_retrograde, sign, house = data
 
             if planet in planets_exaltation:
-                this_index += float(self.ranking['exalted'])
+                this_index += float(self.feature_ranking['exalted_planet'])
             
             if planet in self.retrogrades_now:
-                this_index -= float(self.ranking['retrograde'])
+                this_index -= float(self.feature_ranking['retrograde_planet'])
             
             if house in investing_houses:
-                this_index += float(self.ranking['super_bullish'])
+                this_index += float(self.sentiment_ranking['super_bullish'])
             
             if planet in super_bullish_planets:
-                this_index += float(self.ranking['super_bullish'])
+                this_index += float(self.sentiment_ranking['super_bullish'])
             
         
         return this_index
@@ -648,12 +586,11 @@ class Collective:
         this_index = 0
         houses_ranking = self.collective_intel['investing_houses']
         aspects_ranking = self.general_intel['angle_aspects_ranking']
-        ranking = self.ranking
 
         for house in self.chart_data['houses']:
             start_degree, end_degree, sign, house, planets = house
             if house in houses_ranking:
-                this_index += float(ranking['super_bullish'])
+                this_index += float(self.sentiment_ranking['super_bullish'])
         
         for aspect in self.chart_data['aspects']:
             aspected_planet, aspecting_planet, aspect, orb, diff = aspect
@@ -672,12 +609,11 @@ class Collective:
         this_index = 0
         houses_ranking = self.collective_intel['investing_houses']
         aspects_ranking = self.general_intel['angle_aspects_ranking']
-        ranking = self.ranking
 
         for planet in self.whole_sign_houses['planets']:
             planet, full_degree, norm_degree, speed, is_retrograde, sign, house = planet
             if house in houses_ranking:
-                this_index += float(ranking['super_bullish'])
+                this_index += float(self.sentiment_ranking['super_bullish'])
         
         for aspect in self.whole_sign_houses['aspects']:
             aspected_planet, aspecting_planet, aspect, orb, diff = aspect
@@ -698,12 +634,11 @@ class Collective:
         this_index = 0
         houses_ranking = self.collective_intel['investing_houses']
         aspects_ranking = self.general_intel['angle_aspects_ranking']
-        ranking = self.ranking
 
         for planet in self.natal_chart['planets']:
             planet, full_degree, norm_degree, speed, is_retrograde, sign, house = planet
             if house in houses_ranking:
-                this_index += float(ranking['super_bullish'])
+                this_index += float(self.sentiment_ranking['super_bullish'])
         
         for aspect in self.natal_chart['aspects']:
             aspected_planet, aspecting_planet, aspect, orb, diff = aspect

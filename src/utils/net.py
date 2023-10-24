@@ -75,46 +75,8 @@ def get_datetime_now_at_given_timezone(tzone_name=None) -> dict:
     return now.day, now.month, now.year, now.hour, now.minute
 
 
-def get_timespace_dict(day=None, month=None, year=None, hour=None, mins=None, lat=None, \
-                  lon=None, tzone=None, city=None, country=None) -> dict:
-    """Craft data to send to the API."""
 
-    if not lat or not lon:
-        lat, lon = get_lat_and_lon_at_given_city(city, country)
-    os.log_debug(f'Using coordinates {lat}, {lon}')
-
-    if not tzone:
-        tzone_name, tzone = get_timezone_offset_at_given_location(lat, lon)
-        os.log_debug(f'Using timezone {tzone}')
-
-    if not day or not month or not year or not hour or not mins:
-        day, month, year, hour, mins = get_datetime_now_at_given_timezone(tzone_name)
-    os.log_debug(f'Using date {day}/{month}/{year} {hour}:{mins}')
-
-    return {
-        'day': day,
-        'month': month,
-        'year': year,
-        'hour': hour,
-        'min': mins,
-        'lat': lat,
-        'lon': lon,
-        'tzone': tzone,
-        'tzone_name': tzone_name
-    }    
 
     
-def craft_request(env_vars, endpoint, data, custom_data=None) -> dict:
-    """Send request to a designed endpoint in the API."""
-
-    if custom_data:
-        data.update(custom_data)
-
-    api_key = env_vars['API_KEY']
-    usr_id = env_vars['USER_ID']
-    url = urljoin(env_vars['API_URL'], endpoint)
-    os.log_debug(f'Requesting URL {url}')
-
-    return send_request(url, data, auth=(usr_id, api_key))
 
 

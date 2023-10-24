@@ -6,7 +6,7 @@ import argparse
 
 from src.utils.os import load_config
 from src.utils.plot import plot_collective
-from src.intel.collective import Collective
+from src.intel.collective import CollectiveIndex
 
 
 def run_menu() -> argparse.ArgumentParser:
@@ -40,38 +40,34 @@ def run() -> None:
     parser = run_menu()
     args = parser.parse_args()
     PRINT_PLOT = False
+    c = CollectiveIndex(env_vars)
 
     # TODO: Add argument for city and country
     if args.collective_today:
-        c = Collective(env_vars)
+        
         c.get_collective_forecast_today()
 
     elif args.collective_monthly:
-        c = Collective(env_vars)
         c.get_collective_forecast_monthly()
         # TODO: remove plot from here, add option to save/name
         if PRINT_PLOT:
             plot_collective(c.transit_index, "Collective Transit Index (monthly))")
     
     elif args.collective_custom:
-        c = Collective(env_vars)
         c.get_collective_forecast_custom()
         # TODO: remove plot from here, add option to save/name
         if PRINT_PLOT:
             plot_collective(c.transit_index, "Collective Transit Index (daily))")
     
     elif args.moon:
-        c = Collective(env_vars)
         c.get_collective_forecast_moon()
         if PRINT_PLOT:
             plot_collective(c.moon_phase, "Moon Phase")
     
     elif args.transit:
-        c = Collective(env_vars)
         c.get_transit_forecast()
     
     elif args.collective:
-        c = Collective(env_vars)
         c.get_collective_forecast_today()
         c.get_collective_forecast_monthly()
         c.get_collective_forecast_custom()
@@ -82,20 +78,16 @@ def run() -> None:
         plot_collective(c.transit_index, "Collective Transit Index (all intel))")
         
     elif args.wheel:
-        c = Collective(env_vars)
         c.get_wheel()
 
     elif args.chart_data:
-        c = Collective(env_vars)
         c.get_chart_data()
     
     elif args.whole_sign:
-        c = Collective(env_vars)
         c.get_whole_sign_houses()
     
     elif args.natal:
         # TODO: this does not work
-        c = Collective(env_vars)
         c.get_natal_chart()
 
     else:
