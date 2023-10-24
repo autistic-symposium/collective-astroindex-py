@@ -95,11 +95,11 @@ aspects:
 ######################
 
 moon_phase:
-  'First Quarter Moon': bullish
-  'Full Moon': bearish
-  'Last Quarter Moon': neutral
-  'New Moon': bullish
-  'Waning Crescent Moon': neutral
-  'Waning Gibbous Moon': neutral
-  'Waxing Crescent Moon': neutral
-  'Waxing Gibbous Moon': neutral
+  'first quarter moon': bullish
+  'full moon': bearish
+  'last quarter moon': neutral
+  'new moon': bullish
+  'waning crescent moon': neutral
+  'waning gibbous moon': neutral
+  'waxing crescent moon': neutral
+  'waxing gibbous moon': neutral

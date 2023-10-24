@@ -11,9 +11,9 @@ class CollectiveIndex:
 
     def __init__(self, city=None, country=None):
 
-        #####################
-        ### Load YAML intels
-        #####################
+        ######################
+        ### Load intel YAMLs
+        ######################
         self.env_vars = os.load_config()
         self.ranking = self._load_ranking()
         self.api = aw.AstrologyAPIWrapper(self.env_vars)
@@ -32,7 +32,7 @@ class CollectiveIndex:
         ### Create data dicts 
         ########################
         self.transit_daily = {t: [] for t in ['ascendant', 'houses', 'aspects']}
-        self.transit_monthly = {t: [] for t in ['aspects', 'retrograde', 'moon_phase']}
+        self.transit_monthly = {t: [] for t in ['aspects', 'moon_phase']}
         self.transits_natal_daily = {t: [] for t in ['ascendant', 'houses']}
         self.moon_phase = {}
         self.planet_tropical = {}
@@ -76,6 +76,7 @@ class CollectiveIndex:
 
         ### Parse the ascendant
         self.transit_daily['ascendant'] = data['ascendant'].lower()
+        self.transit_daily['date'] = os.convert_date_format(data['transit_date'])
 
         for feature in data['transit_house']:
             planet = feature['planet'].lower()
@@ -93,30 +94,42 @@ class CollectiveIndex:
             planet2 = aspect['transit_planet'].lower()
             transit_type = aspect['type'].lower()
             orb = float(aspect['orb'])
-
+            
             self.transit_daily['aspects'].append({'planet1': planet1,
-                                                         'planet2': planet2,
-                                                         'transit_type': transit_type,
-                                                         'orb': orb})  
+                                                  'planet2': planet2,
+                                                  'transit_type': transit_type,
+                                                  'orb': orb})  
 
 
     def _parse_transits_monthly(self, data: dict) -> None:
 
+        self.transit_monthly['aspects'] = {}
         for aspect in data['transit_relation']:
             planet1 = aspect['natal_planet'].lower()
             planet2 = aspect['transit_planet'].lower()
             transit_type = aspect['type'].lower()
             orb = float(aspect['orb'])
-            date = aspect['date']
+            date = os.convert_date_format(aspect['date'])
 
-        for retrograde in data['retrograde']:
-            pass
+            self.transit_monthly['aspects'][date] = {
+                                    'planet1': planet1,
+                                    'planet2': planet2,
+                                    'transit_type': transit_type,
+                                    'orb': orb
+                                }
 
+        self.transit_monthly['moon_phase'] = {}
         for moon_phase in data['moon_phase']:
-            pass
-            #date, time = m['date'].split('T')
-            #self.moon_phase[date] = (m['phase'].lower(), time, m['sign'].lower())
-
+            phase_type = moon_phase['phase_type'].lower()
+            date = os.convert_date_format(moon_phase['date'].split('T'))
+            sign = moon_phase['sign'].lower()
+            house = moon_phase['house']
+            
+            self.transit_monthly['moon_phase'][date] = {
+                                    'phase_type': phase_type,
+                                    'sign': sign,
+                                    'house': house
+                                }    
 
 
     def _parse_transits_natal_daily(self, data: dict) -> None:
@@ -322,24 +335,35 @@ class CollectiveIndex:
         return index
 
 
-    def _calculate_index_for_aspects(self, aspects) -> int:
+    def _calculate_index_for_aspect(self, aspect) -> int:
 
-        for item in aspects:
-            planet1 = item['planet1']
-            planet2 = item['planet2']
-            transit_type = item['transit_type']
-            orb = item['orb']
+        planet1 = aspect['planet1']
+        planet2 = aspect['planet2']
+        transit_type = aspect['transit_type']
+        orb = aspect['orb']
 
-            planet1_index = self.planet_intel[planet1]
-            planet2_index = self.planet_intel[planet2]
-            aspect_index = self.aspect_intel[transit_type]
-            orb_index = 1 - (orb / 10)
+        planet1_index = self.planet_intel[planet1]
+        planet2_index = self.planet_intel[planet2]
+        aspect_index = self.aspect_intel[transit_type]
+        orb_index = 1 - (orb / 10)
 
-            index = planet1_index * planet2_index * aspect_index * orb_index
-
-        return index
+        return (planet1_index + planet2_index + aspect_index) * orb_index
 
 
+    def _calculate_index_for_moon_phase(self, phase) -> int:
+            
+        sign = phase['sign']
+        house = phase['house']
+        phase_type = phase['phase_type']
+
+        phase_index = self.moon_phase_intel[phase_type] 
+        planet_index = self.planet_intel['moon']
+        house_index = self.houses_intel[house]
+        dignities_index = self.dignities_intel[self.dignities_info['moon'][sign]]
+
+        return phase_index * (planet_index + house_index + dignities_index)
+        
+    
     #############################################
     #    Private methods: Creating the indexes
     #############################################
@@ -347,32 +371,39 @@ class CollectiveIndex:
     def _create_index_transits_daily(self) -> int:
 
         ascendant = self.transit_daily['ascendant']
-        houses = self.transit_daily['houses']
         aspects = self.transit_daily['aspects']
+        houses = self.transit_daily['houses']
+        date = self.transit_daily['date']
 
-        return self._calculate_index_for_ascendant(ascendant) + \
-               self._calculate_index_for_houses(houses) + \
-               self._calculate_index_for_aspects(aspects)
-    
+        index_here = 0
+        for aspect in aspects:
+            index_here += self._calculate_index_for_aspect(aspect)
+
+        index_here += self._calculate_index_for_ascendant(ascendant) + \
+                                     self._calculate_index_for_houses(houses) 
+
+        self.collective_index[date] = index_here
+        return index_here
+                                
 
     def _create_index_transits_monthly(self) -> dict:
-        """Create index from transits monthly."""
-        angle_aspects_ranking = self.general_intel['angle_aspects_ranking']
 
-        # create a new (temporal) sorted structure for dates vs. indexes
-        # date and data has the following format:
-        # '1-10-2023': [('moon', 'uranus', 'trine', 3.79), ('moon', 'neptune', 'sextile', 0.47)]
-        for date, data in self.transit_monthly.items():
-            
-            self.transit_index[date] = 0
+        aspects = self.transit_monthly['aspects']
+        moon_phase = self.transit_monthly['moon_phase']
 
-            for t in data:
-                planet1, planet2, transit_type, orb = t
-                if planet1 == planet2:
-                    continue
+        for date, aspect in aspects.items():
+            index_aspect = self._calculate_index_for_aspect(aspect)
+            if date in self.collective_index:
+                self.collective_index[date] += index_aspect
+            else:
+                self.collective_index[date] = index_aspect
 
-                index_here = float(angle_aspects_ranking[transit_type]) * (10 - float(orb)) / 10
-                self.transit_index[date] += index_here
+        for date, phase in moon_phase.items():
+            index_phase = self._calculate_index_for_moon_phase(phase)
+            if date in self.collective_index:
+                self.collective_index[date] += index_phase
+            else:
+                self.collective_index[date] = index_phase
 
     
     def _create_transits_natal_daily(self) -> dict:
@@ -522,11 +553,9 @@ class CollectiveIndex:
         response = self.api.request_transits_monthly()
         self._parse_transits_monthly(response)
 
-        this_index = self._create_index_transits_monthly()
-        this_date = self.api.get_request_date()
+        self._create_index_transits_monthly()
 
-        os.log_info(f'Index I.b ({this_date}): {this_index}')
-
+        os.log_info(f'Index I.b ({self.collective_index})')
 
     def get_transits_natal_daily(self) -> None:
 

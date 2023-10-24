@@ -6,6 +6,7 @@ import sys
 import yaml
 import logging
 from pathlib import Path
+from datetime import datetime
 from dotenv import load_dotenv
 from pprint import PrettyPrinter
 
@@ -102,3 +103,18 @@ def pprint(data: dict, indent=None) -> None:
     pp = PrettyPrinter(indent=indent)
     pp.pprint(data)
     print()
+
+
+def convert_date_format(date: str) -> str:
+    """Convert date format to YYYY-MM-DD"""
+    
+    try:
+        date = datetime.strptime(date, '%m-%d-%Y')
+    except ValueError as e:
+        try:
+            date = datetime.strptime(date, '%d-%m-%Y')
+        except ValueError as e:
+            exit_with_error(f'Cannot parse date {date}: {e}. Exiting.')
+
+    required_format_str = '%Y-%m-%d'
+    return date.strftime(required_format_str)
