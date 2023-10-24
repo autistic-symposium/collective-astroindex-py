@@ -18,32 +18,29 @@ class AstrologyAPIWrapper:
     #       Private methods     #
     #############################
 
-    def _retrieve_timespace(self, data) -> dict:
+    def _retrieve_timespace(self, data) -> None:
 
         if not 'city' in data or not 'country' in data:
             data['city'], data['country'] = net.get_city_and_country_from_ip()
                                  
         if not 'lat' in data or not 'lon' in data:
             data['lat'], data['lon'] = \
-                            net.get_lat_and_lon_at_given_city(data['city'], data['country'])
-        os.log_debug(f'Using coordinates {data["lat"]}, {data["lon"]}')
+                    net.get_lat_and_lon_at_given_city(data['city'], data['country'])
 
         if not 'tzone' in data:
             data['tzone_name'], data['tzone'] = \
-                            net.get_timezone_offset_at_given_location(data['lat'], data['lon'])
-            os.log_debug(f'Using timezone {data["tzone_name"]} with offset {data["tzone"]}')
-
+                    net.get_timezone_offset_at_given_location(data['lat'], data['lon'])
+            
         if not 'day' in data or \
            not 'month' in data or \
            not 'year' in data or \
            not 'hour' in data or \
-           not 'mins' in data:
-                data['day'], data['month'], data['year'], data['hour'], data['mins'] = \
-                            net.get_datetime_now_at_given_timezone(data['tzone_name'])
-        os.log_debug(f'Date {data["day"]}-{data["month"]}-{data["year"]} {data["hour"]}:{data["mins"]}')
+           not 'min' in data:
+                data['day'], data['month'],data['year'], data['hour'], data['min'] = \
+                    net.get_datetime_now_at_given_timezone(data['tzone_name'])
 
         data['house_system'] = 'whole_sign'
-        self.timespace = data 
+        self.timespace = data
 
 
     def _craft_request(self, endpoint, data=None) -> dict:

@@ -18,13 +18,7 @@ def send_request(url: str, data=None, auth=None, params=None) -> dict:
     if not params:
         params = {'header': 'Content-Type: application/json'}
     try:
-        print(f'URL: {url}')
-        print(f'Data: {data}')
-        print(f'Auth: {auth}')
-        print(f'Params: {params}')
         r = requests.post(url, data=data, auth=auth, params=params)
-        print(f'Response: {r}')
-        
 
     except requests.exceptions.HTTPError as e:
         raise Exception(f'{url}: {e.response.text}')
