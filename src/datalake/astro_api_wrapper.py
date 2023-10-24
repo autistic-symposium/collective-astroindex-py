@@ -53,7 +53,11 @@ class AstrologyAPIWrapper:
         url = net.compose_url(self.env_vars['API_URL'], endpoint)
         os.log_debug(f'Requesting URL {url}')
 
-        return net.send_request(url, self.timespace, auth=(usr_id, api_key))
+        response = net.send_request(url, self.timespace, auth=(usr_id, api_key))
+        if response is None:
+            os.exit_with_error(f'No response from {url}')
+        
+        return response
 
 
     #############################  
