@@ -2,54 +2,6 @@
 # they are generally used to determine the overall market sentiment
 # and they are a high level intel of transits
 
-super_bullish_planets:
-  - 'jupiter'
-  - 'venus'
-  - 'rahu'  # north node
-
-bullish_planets:
-  - 'sun'
-  - 'mercury'
-
-super_bearish_planets:
-  - 'saturn'
-  - 'mars'
-  - 'ketu'  # south node
-
-unclear_planets:
-  - 'pluto'
-  - 'neptune'
-  - 'uranus'
-  - 'moon'
-
-investing_houses:
-  - 2
-  - 5
-  - 8
-
-good_luck_houses:
-  - 4
-  - 9
-  - 10
-  - 11
-
-other_houses:
-  - 1
-  - 3
-  - 6
-  - 7
-  - 12
-
-planets:
-  exalted_planet: 
-  retrograde_planet: G
-  detrimented_planet: F
-
-
-
-
-
-
 ascendant:
   aries: slightly_bullish        # 5th house leo, 8th house scorpio
   taurus: slightly_bullish       # 5th house virgo, 8th house sagittarius
@@ -79,6 +31,7 @@ houses:
   12: slightly_bearish
 
 planets:
+  ascendant: neutral
   sun: neutral
   moon: neutral
   mercury: neutral
@@ -104,3 +57,15 @@ dignities:
   term: neutral
   face: neutral
   peregrine: neutral
+
+aspects:
+  conjunction: super_bullish
+  opposition: super_bearish
+  trine: very_bullish
+  square: very_bearish
+  sextile: bullish
+  quincunx: neutral
+  semisextile: neutral
+  semisquare: neutral
+  sesquiquadrate: neutral
+  quintile: neutral

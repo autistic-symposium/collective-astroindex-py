@@ -26,6 +26,7 @@ class CollectiveIndex:
         self.planet_intel = self._load_intel('STRATEGIES_COLLECTIVE', 'planets')
         self.retrograde_intel = self._load_intel('STRATEGIES_COLLECTIVE', 'retrograde')
         self.dignities_intel = self._load_intel('STRATEGIES_COLLECTIVE', 'dignities')
+        self.aspect_intel = self._load_intel('STRATEGIES_COLLECTIVE', 'aspects')
 
 
         ######################
@@ -130,12 +131,12 @@ class CollectiveIndex:
                                                 'house': house,
                                                 'is_retrograde': is_retrograde})
 
-        ### Parse the transits
-        for transit in data['transit_relation']:
-            planet1 = transit['natal_planet'].lower()
-            planet2 = transit['transit_planet'].lower()
-            transit_type = transit['type'].lower()
-            orb = float(transit['orb'])
+        ### Parse the aspects
+        for aspect in data['transit_relation']:
+            planet1 = aspect['natal_planet'].lower()
+            planet2 = aspect['transit_planet'].lower()
+            transit_type = aspect['type'].lower()
+            orb = float(aspect['orb'])
 
             if planet1 != planet2:
                 self.transit_daily['aspects'].append({'planet1': planet1,
@@ -429,6 +430,7 @@ class CollectiveIndex:
 
         return self.ascendant_intel[ascendant]
 
+
     def _calculate_index_for_houses(self, houses) -> int:
 
         index = 0
@@ -453,6 +455,25 @@ class CollectiveIndex:
         return index
 
 
+    def _calculate_index_for_aspects(self, aspects) -> int:
+
+        for item in aspects:
+            planet1 = item['planet1']
+            planet2 = item['planet2']
+            transit_type = item['transit_type']
+            orb = item['orb']
+
+            planet1_index = self.planet_intel[planet1]
+            planet2_index = self.planet_intel[planet2]
+            aspect_index = self.aspect_intel[transit_type]
+            orb_index = 1 - (orb / 10)
+
+            index = planet1_index * planet2_index * aspect_index * orb_index
+
+        return index
+
+
+
     #############################################
     #    Private methods: Creating the indexes
     #############################################
@@ -464,86 +485,9 @@ class CollectiveIndex:
         aspects = self.transit_daily['aspects']
 
         return self._calculate_index_for_ascendant(ascendant) + \
-               self._calculate_index_for_houses(houses) #+  
-                #self._calculate_index_for_aspects(aspects)
+               self._calculate_index_for_houses(houses) + \
+               self._calculate_index_for_aspects(aspects)
     
-
-
-
-
-
-        '''
-        super_bullish_planets = self.collective_intel['super_bullish_planets']
-        investing_houses = self.collective_intel['investing_houses']
-        planets_exaltation = self.general_intel['planets_exaltation']
-
-        for planet in super_bullish_planets:
-            
-            if planet in self.planets_now and self.planets_now[planet] in planets_exaltation:
-                os.log_debug(f'{planet} is exalted in {self.planets_now[planet]}')
-                index += float(self.feature_ranking['exalted_planet'])
-            
-            if planet in self.retrogrades_now:
-                os.log_debug(f'{planet} is retrograde')
-                index -= float(self.feature_ranking['retrograde_planet'])
-            
-            for house in investing_houses:
-                if planet in self.houses_now[house]:
-                    os.log_debug(f'{planet} is in house {house}')
-                    index += float(self.sentiment_ranking['super_bullish'])
-
-        ### Look at bullish transits
-
-        bullish_planets = self.collective_intel['bullish_planets']
-        
-        for planet in bullish_planets:
-            
-            if self.planets_now[planet] in planets_exaltation:
-                os.log_debug(f'{planet} is exalted in {self.planets_now[planet]}')
-                index += float(self.feature_ranking['exalted_planet'])
-            
-            if planet in self.retrogrades_now:
-                os.log_debug(f'{planet} is retrograde')
-                index -= float(self.feature_ranking['retrograde_planet'])
-            
-            for house in investing_houses:
-                if planet in self.houses_now[house]:
-                    os.log_debug(f'{planet} is in house {house}')
-                    index += float(self.sentiment_ranking['bullish'])
-
-            # TODO: add angles in exaltation
-            # TODO: add path of fortune in exaltation
-
-        ### Look at bearish transits
-
-        bearish_planets = self.collective_intel['super_bearish_planets']
-        bearish_houses = self.collective_intel['other_houses']
-        
-        for planet in bearish_planets:
-            
-            if planet in self.planets_now and self.planets_now[planet] in planets_exaltation:
-                os.log_debug(f'{planet} is exalted in {self.planets_now[planet]}')
-                index -= float(self.feature_ranking['detriment_planet'])
-            
-            if planet in self.retrogrades_now:
-                os.log_debug(f'{planet} is retrograde')
-                index -= float(self.feature_ranking['retrograde_planet'])
-            
-            for house in investing_houses:
-                if planet in self.houses_now[house]:
-                    os.log_debug(f'{planet} is in house {house}')
-                    index -= float(self.sentiment_ranking['bearis_planet'])
-            
-            for house in bearish_houses:
-                if planet in self.houses_now[house]:
-                    os.log_debug(f'{planet} is in house {house}')
-                    index -= float(self.sentiment_ranking['super_bearish'])
-
-            # TODO: add angles in detriment
-
-        ### Return the index
-        return index
-    '''
 
     def _create_index_transits_monthly(self) -> dict:
         """Create index from transits monthly."""

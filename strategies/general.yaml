@@ -57,7 +57,6 @@ dignities:
   'ketu':
     'sagittarius': 'exalted'
 
-
 houses_by_element:
   1: 'fire'
   2: 'earth'
@@ -99,6 +98,31 @@ houses_by_sign:
   11: 'aquarius'
   12: 'pisces'
 
+aspects:
+  'conjunction': 0
+  'opposition': 180
+  'trine': 120
+  'square': 90
+  'sextile': 60
+  'quincunx': 150
+  'semisextile': 30
+  'semisquare': 45
+  'quintile': 72
+  'sesquiquadrate': 135
+  'biquintile': 144
+  'semisquare': 45
+  'novile': 40
+  'binovile': 80
+  'triseptile': 154
+  'quintile': 72
+  'septile': 51.42857142857143
+  'biseptile': 102.85714285714286
+  'triseptile': 154.28571428571428
+
+
+
+
+
 
 
 # TODO: fix this https://en.wikipedia.org/wiki/Exaltation_(astrology)
@@ -122,12 +146,7 @@ angles_detriment:
   'saturn': [21, 20]
 
 # TODO: add support to other aspects
-angles_aspects:
-  'conjunction': 0
-  'opposition': 180
-  'trine': 120
-  'square': 90
-  'sextile': 60
+
 
 angle_aspects_ranking:
   'conjunction': 10
