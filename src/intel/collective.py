@@ -11,12 +11,12 @@ import src.datalake.astro_api_wrapper as aaw
 
 class CollectiveIndex:
 
-    def __init__(self, env_vars, city=None, country=None):
+    def __init__(self, city=None, country=None):
 
         #####################
         ### Load YAML intels
         #####################
-        self.env_vars = env_vars
+        self.env_vars = os.load_config()
         self.ranking = self._load_ranking()
         
         self.dignities_info = self._load_general_info('STRATEGIES_GENERAL', 'dignities')
@@ -32,7 +32,8 @@ class CollectiveIndex:
         ######################
         ### Create data dicts 
         ######################
-        self.transit_daily = {t : [] for t in ['ascendant', 'houses', 'aspects']}
+        self.transit_daily = {t: [] for t in ['ascendant', 'houses', 'aspects']}
+        self.transit_monthly = {}
 
 
 
@@ -119,7 +120,6 @@ class CollectiveIndex:
         ### Parse the ascendant
         self.transit_daily['ascendant'] = data['ascendant'].lower()
 
-        ### Parse the houses
         for feature in data['transit_house']:
             planet = feature['planet'].lower()
             sign = feature['natal_sign'].lower()
@@ -131,7 +131,6 @@ class CollectiveIndex:
                                                 'house': house,
                                                 'is_retrograde': is_retrograde})
 
-        ### Parse the aspects
         for aspect in data['transit_relation']:
             planet1 = aspect['natal_planet'].lower()
             planet2 = aspect['transit_planet'].lower()
@@ -145,43 +144,16 @@ class CollectiveIndex:
                                                          'orb': orb})  
 
 
-    def _parse_data_transits_monthly(self, data: dict) -> None:
-        """Parse data from transits monthly."""
+    def _parse_transits_monthly(self, data: dict) -> None:
 
-        ### Divide and save the data
-        # TODO: period is not used
-        period = [data['month_start_date'], data['month_end_date']]
-        # the moon api and retrograde api doesn't seen to be working
-        moon_phase = data['moon_phase']
-        retrogrades = data['retrogrades']
-        transit_relation = data['transit_relation']
-
-        ### Get transits
-        for t in transit_relation:
-            planet1 = t['natal_planet'].lower()
-            planet2 = t['transit_planet'].lower()
-            transit_type = t['type'].lower()
-            orb = float(t['orb'])
-            date = t['date']
-
-            if planet1 == planet2:
-                continue
-            if date not in self.transit_monthly:
-                self.transit_monthly[date] = [(planet1, planet2, transit_type, orb)]
-            else:
-                self.transit_monthly[date].append((planet1, planet2, transit_type, orb))
+        for aspect in data['transit_relation']:
+            pass
         
-        ### Get moon phases
-        # TODO: this has no data
-        for m in moon_phase:
-            date, time = m['date'].split('T')
-            self.moon_phase[date] = (m['phase'].lower(), time, m['sign'].lower())
+        for moon_phase in data['moon_phase']:
+            pass
+            #date, time = m['date'].split('T')
+            #self.moon_phase[date] = (m['phase'].lower(), time, m['sign'].lower())
 
-        ### Print the data
-        os.log_debug(f'Moon phases: {self.moon_phase}')
-        os.log_debug(f'Transits monthly: {self.transit_monthly}')
-
-        # TODO: why I am getting old dates? remove them
 
 
     def _parse_data_transits_daily_custom(self, data: dict) -> None:
@@ -473,7 +445,6 @@ class CollectiveIndex:
         return index
 
 
-
     #############################################
     #    Private methods: Creating the indexes
     #############################################
@@ -673,12 +644,12 @@ class CollectiveIndex:
         os.log_info(f'Index I.a ({this_date}): {this_index}')
 
 
-    def get_collective_transits_monthly(self) -> None:
+    def get_transits_monthly(self) -> None:
 
         os.log_info(f'Getting collective transits monthly...')
         response = self.api.request_transits_monthly()
 
-        self._parse_data_transits_monthly(response)
+        self._parse_transits_monthly(response)
         self._create_index_transits_monthly()
         os.log_info(f'Monthly indexes: {self.transit_index}')
 
@@ -713,7 +684,7 @@ class CollectiveIndex:
         os.log_info(f'Getting transit forecast...')
         response = self.api.request_planet_tropical()
 
-        self._parse_data_transits_forecast(response)
+        self._parse_transits_forecast(response)
         this_index = self._create_index_transits_forecast()
         os.log_info(f'Transit index: {this_index}')
         

@@ -4,7 +4,6 @@
 
 import argparse
 
-from src.utils.os import load_config
 from src.utils.plot import plot_collective
 from src.intel.collective import CollectiveIndex
 
@@ -12,10 +11,10 @@ from src.intel.collective import CollectiveIndex
 def run_menu() -> argparse.ArgumentParser:
 
     parser = argparse.ArgumentParser(description='✨ AstroIDX I: Collective ✨')
-    parser.add_argument('-ct', dest='collective_today', action='store_true',
-                        help='Forecast for the collective today.')
-    parser.add_argument('-cm', dest='collective_monthly', action='store_true',
-                        help='Forecast for the collective this month.')
+    parser.add_argument('-a', dest='transit_daily', action='store_true',
+                        help='Calculate index for transit_daily.')
+    parser.add_argument('-b', dest='transit_monthly', action='store_true',
+                        help='Calculate index for transit_monthly.')
     parser.add_argument('-cc', dest='collective_custom', action='store_true',
                         help='Forecast for the collective in a custom date range.')
     parser.add_argument('-m', dest='moon', action='store_true',
@@ -36,30 +35,27 @@ def run_menu() -> argparse.ArgumentParser:
 
 def run() -> None:
 
-    env_vars = load_config()
     parser = run_menu()
     args = parser.parse_args()
-    PRINT_PLOT = False
-    c = CollectiveIndex(env_vars)
+    c = CollectiveIndex()
 
-    # TODO: Add argument for city and country
-    if args.collective_today:
+    if args.transit_daily:
         c.get_transits_daily()
 
-    elif args.collective_monthly:
-        c.get_collective_forecast_monthly()
-        # TODO: remove plot from here, add option to save/name
-        if PRINT_PLOT:
-            plot_collective(c.transit_index, "Collective Transit Index (monthly))")
+    elif args.transit_monthly:
+        c.get_transits_monthly()
+
     
     elif args.collective_custom:
         c.get_collective_forecast_custom()
         # TODO: remove plot from here, add option to save/name
+        PRINT_PLOT = False
         if PRINT_PLOT:
             plot_collective(c.transit_index, "Collective Transit Index (daily))")
     
     elif args.moon:
         c.get_collective_forecast_moon()
+        PRINT_PLOT = False
         if PRINT_PLOT:
             plot_collective(c.moon_phase, "Moon Phase")
     
