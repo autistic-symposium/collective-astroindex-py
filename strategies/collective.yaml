@@ -57,6 +57,7 @@ planets:
   rahu: super_bullish
   ketu: super_bearish
 
+
 retrograde:
   true: slightly_bullish   
   false: very_bearish            
@@ -96,9 +97,9 @@ aspects:
 moon_phase:
   'First Quarter Moon': bullish
   'Full Moon': bearish
-  'Last Quarter Moon': unclear
+  'Last Quarter Moon': neutral
   'New Moon': bullish
-  'Waning Crescent Moon': unclear
-  'Waning Gibbous Moon': unclear
-  'Waxing Crescent Moon': unclear
-  'Waxing Gibbous Moon': unclear
+  'Waning Crescent Moon': neutral
+  'Waning Gibbous Moon': neutral
+  'Waxing Crescent Moon': neutral
+  'Waxing Gibbous Moon': neutral

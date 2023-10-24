@@ -1,12 +1,10 @@
 # -*- encoding: utf-8 -*-
 # src/intel/collective.py
 
-#TODO: move to utils
-from datetime import timedelta, datetime
 
 import src.utils.os as os
 import src.utils.network as net
-import src.datalake.astro_api_wrapper as aaw
+import src.datalake.astro_api_wrapper as aw
 
 
 class CollectiveIndex:
@@ -18,6 +16,7 @@ class CollectiveIndex:
         #####################
         self.env_vars = os.load_config()
         self.ranking = self._load_ranking()
+        self.api = aw.AstrologyAPIWrapper(self.env_vars)
         
         self.dignities_info = self._load_general_info('STRATEGIES_GENERAL', 'dignities')
         
@@ -27,66 +26,21 @@ class CollectiveIndex:
         self.retrograde_intel = self._load_intel('STRATEGIES_COLLECTIVE', 'retrograde')
         self.dignities_intel = self._load_intel('STRATEGIES_COLLECTIVE', 'dignities')
         self.aspect_intel = self._load_intel('STRATEGIES_COLLECTIVE', 'aspects')
+        self.moon_phase_intel = self._load_intel('STRATEGIES_COLLECTIVE', 'moon_phase')
 
-
-        ######################
+        ########################
         ### Create data dicts 
-        ######################
+        ########################
         self.transit_daily = {t: [] for t in ['ascendant', 'houses', 'aspects']}
-        self.transit_monthly = {}
-
-
-
-
-
-        self.api = aaw.AstrologyAPIWrapper(self.env_vars)
-        # TODO: clean this up
-        self.collective_intel = os.load_yaml(self.env_vars['STRATEGIES_COLLECTIVE'])
-        self.general_intel = os.load_yaml(self.env_vars['STRATEGIES_GENERAL'])
-        #self.moon_intel = os.load_yaml(self.env_vars['STRATEGIES_MOON'])
-
-        
-        self.collective_index = {}
-        self.location = (city, country)
-        self.ascendant_now = None
-        self.houses_now = {h: [] for h in range(1, 13)}
-        self.planets_now = {}
-        self.retrogrades_now = []
+        self.transit_monthly = {t: [] for t in ['aspects', 'retrograde', 'moon_phase']}
+        self.transits_natal_daily = {t: [] for t in ['ascendant', 'houses']}
         self.moon_phase = {}
+        self.planet_tropical = {}
+        self.chart_data = {t: [] for t in ['houses', 'aspects']}
+        self.western_horoscope = {t: [] for t in ['planets', 'houses', 'aspects', 'ascendant', 'midheaven', 'vertex', 'lilith']}
 
-        #TODO: move this to yaml
-        self.transit_now = {t: [] for t in ['conjunction', 'trine', 'square', 'opposition', 'sextile']}
-        self.transit_monthly = {}
-        self.transit_now_custom = {}
-        self.transit_moon = {}
-        self.transit_forecast = {}
-        self.chart_data = {'houses': [], 'aspects': []}
-        self.whole_sign_houses = {
-                        'planets': [], 
-                        'houses': [], 
-                        'vertex': None, 
-                        'midheaven': None,
-                        'lilith': None,
-                        'aspects': [],
-                        'ascendant': None
-                        }
-        self.natal_chart = {
-                        'planets': [],
-                        'houses': [],
-                        'aspects': [],
-                        'ascendant': None,
-                        'midheaven': None,
-                        'lilith': None,
-                        'vertex': None,
-                        'moon_phase': [],
-                        'elements': [],
-                        'modes': [],
-                        'dominant_signs': []
-                        }
+        self.collective_index = {}
 
-        self.transit_index = {}
-
-        # TODO: move to a setup() func
 
     ################################
     #   Private methods: Set Up
@@ -94,8 +48,11 @@ class CollectiveIndex:
 
     def _load_ranking(self) -> None:
 
-        ranking = os.load_yaml(self.env_vars['STRATEGIES_RANKING'])
-        return {k: float(ranking['translation'][v]) for k, v in ranking['sentiments'].items()}
+        try:
+            ranking = os.load_yaml(self.env_vars['STRATEGIES_RANKING'])
+            return {k: float(ranking['translation'][v]) for k, v in ranking['sentiments'].items()}
+        except KeyError:
+            os.exit_error(f'Error loading ranking file: {self.env_vars["STRATEGIES_RANKING"]}')
 
     def _translate_ranking(self, intel: dict) -> dict:
 
@@ -152,9 +109,9 @@ class CollectiveIndex:
             orb = float(aspect['orb'])
             date = aspect['date']
 
-      
+        for retrograde in data['retrograde']:
+            pass
 
-        
         for moon_phase in data['moon_phase']:
             pass
             #date, time = m['date'].split('T')
@@ -197,15 +154,16 @@ class CollectiveIndex:
 
                 def daterange(date1, date2):
                     for n in range(int((date2 - date1).days) + 1):
-                        yield date1 + timedelta(n)
+                        yield date1  # + timedelta(n)
 
                 for dt in daterange(start_dt, end_dt):
                     # TODO: fix this
+                    #from datetime import timedelta, datetime
                     this_date = dt.strftime("%Y-%m-%d")
-                    this_date = datetime.strptime(this_date, '%Y-%m-%d').strftime('%d-%m-%Y')
+                    this_date = '1' #datetime.strptime(this_date, '%Y-%m-%d').strftime('%d-%m-%Y')
 
             else:
-                this_date = datetime.strptime(this_date[0], '%Y-%m-%d').strftime('%d-%m-%Y')
+                this_date = 1 #datetime.strptime(this_date[0], '%Y-%m-%d').strftime('%d-%m-%Y')
            
             # TODO: add time
             this_value = (planet1, planet2, transit_type, is_retrograde, transit_sign, house)

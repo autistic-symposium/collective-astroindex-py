@@ -8,7 +8,7 @@ import src.utils.network as net
 
 class AstrologyAPIWrapper:
 
-    def __init__(self, env_vars) -> None:
+    def __init__(self, env_vars):
 
         self.env_vars = env_vars
         self.timespace = {}
