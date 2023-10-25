@@ -190,33 +190,43 @@ class CollectiveIndex:
             sign = item['sign'].lower()
             house = item['house']
             
-            self.planet_tropical[planet] = (full_degree, norm_degree, speed, is_retrograde, sign, house)
+            self.planet_tropical[planet] = {
+                                    'full_degree': full_degree,
+                                    'norm_degree': norm_degree,
+                                    'speed': speed,
+                                    'is_retrograde': is_retrograde,
+                                    'sign': sign,
+                                    'house': house}
 
 
     def _parse_chart_data(self, data: dict) -> None:
-        # TODO
 
-        for key, values in data.items():
+        for item in data['houses']:
+            start_degree = item['start_degree']
+            end_degree = item['end_degree']
+            sign = item['sign'].lower()
+            house = item['house_id']
+            planets = item['planets']
 
-            if key == 'houses':
-                for value in values:
-                    start_degree = value['start_degree']
-                    end_degree = value['end_degree']
-                    sign = value['sign'].lower()
-                    house = value['house_id']
-                    planets = value['planets']
+            self.chart_data['houses'].append({'start_degree': start_degree, 
+                                              'end_degree': end_degree,
+                                              'sign': sign,
+                                              'house': house,
+                                              'planets': planets})
 
-                    self.chart_data['houses'].append((start_degree, end_degree, sign, house, planets))
-            
-            elif key == 'aspects':
-                for value in values:
-                    aspected_planet = value['aspected_planet'].lower()
-                    aspecting_planet = value['aspecting_planet'].lower()
-                    aspect = value['type'].lower()
-                    orb = value['orb']
-                    diff = value['diff']
+        for item in data['aspects']:
+            aspected_planet = item['aspected_planet'].lower()
+            aspecting_planet = item['aspecting_planet'].lower()
+            aspect = item['type'].lower()
+            orb = item['orb']
+            diff = item['diff']
 
-                    self.chart_data['aspects'].append((aspected_planet, aspecting_planet, aspect, orb, diff))
+            self.chart_data['aspects'].append({'aspected_planet': aspected_planet,
+                                               'aspecting_planet': aspecting_planet,
+                                               'aspect': aspect,
+                                               'orb': orb,
+                                               'diff': diff})   
+
 
     def _parse_western_horoscope(self, data: dict) -> None:
         # TODO
@@ -348,14 +358,14 @@ class CollectiveIndex:
         return self._calculate_intel_for_ascendant(ascendant)
     
 
-    def _calculate_index_for_houses(self, houses) -> int:
+    def _calculate_index_for_houses_by_planet(self, houses) -> int:
 
         index = 0
 
         for item in houses:
-            house = item['house']
-            planet = item['planet']
-            sign = item['sign']
+            house = item['house'] 
+            planet = item['planet'] 
+            sign = item['sign'] 
             is_retrograde = item['is_retrograde']
             
             retrograde_index = self._calculate_intel_for_retrograde(is_retrograde)
@@ -366,6 +376,33 @@ class CollectiveIndex:
             index += planet_index * (retrograde_index + sign_index + house_index)
             
         return index
+
+    
+    def _calculate_index_for_houses_by_planets(self, houses) -> int:
+            
+            index = 0
+    
+            for item in houses:
+                house = item['house'] 
+                planets = item['planets'] 
+                start_degree = item['start_degree']
+                end_degree = item['end_degree']
+                
+                for item in planets:
+                    planet = item['name'].lower()
+                    sign = item['sign'].lower()
+                    is_retrograde = item['is_retro']
+                    full_degree = item['full_degree']
+                    
+                    planet_index = self._calculate_intel_for_planet(planet)
+                    sign_index = self._calculate_intel_for_sign(sign, planet)
+                    retrograde_index = self._calculate_intel_for_retrograde(is_retrograde)
+                    
+                    index += planet_index * (retrograde_index + sign_index)
+                
+                index += self._calculate_intel_for_house(house)
+                    
+            return index
 
 
     def _calculate_index_for_aspect(self, aspect) -> int:
@@ -421,7 +458,7 @@ class CollectiveIndex:
             index_here += self._calculate_index_for_aspect(aspect)
 
         index_here += self._calculate_index_for_ascendant(ascendant) + \
-                                     self._calculate_index_for_houses(houses) 
+                                     self._calculate_index_for_houses_by_planet(houses) 
 
         if date in self.collective_index:
             self.collective_index[date] += index_here
@@ -497,30 +534,23 @@ class CollectiveIndex:
             index_here += self._calculate_intel_for_house(house)
             index_here += self._calculate_intel_for_retrograde(is_retrograde)
 
+        self.collective_index[self.api.get_request_date()] = index_here
+
         return index_here
 
 
     def _create_index_chart_data(self) -> dict:
-        # TODO
 
-        this_index = 0
-        houses_ranking = self.collective_intel['investing_houses']
-        aspects_ranking = self.general_intel['angle_aspects_ranking']
+        houses = self.chart_data['houses']
+        aspects = self.chart_data['aspects']
+        index_here = 0
 
-        for house in self.chart_data['houses']:
-            start_degree, end_degree, sign, house, planets = house
-            if house in houses_ranking:
-                this_index += float(self.sentiment_ranking['super_bullish'])
-        
-        for aspect in self.chart_data['aspects']:
-            aspected_planet, aspecting_planet, aspect, orb, diff = aspect
-            # the api has a typo 'semi sqaure'
-            if aspect in aspects_ranking:
-                this_index += float(aspects_ranking[aspect])
-            else:
-                os.log_debug(f'Aspect {aspect} not found in aspects_ranking')
+        index_here += self._calculate_index_for_houses_by_planets(houses)
+        #index_here += self._calculate_index_for_aspect(aspects)
 
-        return this_index
+        self.collective_index[self.api.get_request_date()] = index_here
+
+        return index_here
 
 
     def _create_index_western_horoscope(self) -> dict:

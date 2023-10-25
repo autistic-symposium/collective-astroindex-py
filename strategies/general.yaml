@@ -59,9 +59,20 @@ dignities:
     'sagittarius': 'exalted'
   'north node':
     'gemini': 'exalted'
+  'node':
+    'gemini': 'exalted'
   'south node':
     'sagittarius': 'exalted'
-
+  'part of fortune':
+    'gemini': 'exalted'
+  'chiron':
+    'virgo': 'domicle'
+    'saturn': 'exalted'
+  lilith:
+    'virgo': 'exalted'
+    'capricorn': 'domicile'
+    'cancer': 'detriment'
+    'taurus': 'fall'
 
 houses_by_element:
   1: 'fire'
