@@ -23,6 +23,8 @@ def load_config() -> dict:
 
     try:
         set_logging(os.getenv('LOG_LEVEL'))
+        global REQUIRED_FORMAT_STR
+        REQUIRED_FORMAT_STR = os.getenv('REQUIRED_FORMAT_STR')
 
         env_vars['API_KEY'] = os.getenv('API_KEY')
         env_vars['USER_ID'] = os.getenv('USER_ID')
@@ -109,12 +111,23 @@ def convert_date_format(date: str) -> str:
     """Convert date format to YYYY-MM-DD"""
     
     try:
-        date = datetime.strptime(date, '%m-%d-%Y')
+        date = datetime.strptime(date, REQUIRED_FORMAT_STR)
     except ValueError as e:
         try:
             date = datetime.strptime(date, '%d-%m-%Y')
         except ValueError as e:
-            exit_with_error(f'Cannot parse date {date}: {e}. Exiting.')
+            try:
+                date = datetime.strptime(date, '%m-%d-%Y')
+            except ValueError as e:
+                exit_with_error(f'Cannot parse date {date}: {e}. Exiting.')
 
-    required_format_str = '%Y-%m-%d'
-    return date.strftime(required_format_str)
+    return date.strftime(REQUIRED_FORMAT_STR)
+
+
+def get_middle_datetime(start_date: str, end_date: str) -> str:
+    """Get the middle date between two dates."""
+
+    start_date = datetime.strptime(start_date,REQUIRED_FORMAT_STR)
+    end_date = datetime.strptime(end_date, REQUIRED_FORMAT_STR)
+    middle_date = start_date + (end_date - start_date) / 2
+    return middle_date.strftime(REQUIRED_FORMAT_STR)

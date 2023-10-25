@@ -57,6 +57,10 @@ dignities:
     'gemini': 'exalted'
   'ketu':
     'sagittarius': 'exalted'
+  'north node':
+    'gemini': 'exalted'
+  'south node':
+    'sagittarius': 'exalted'
 
 
 houses_by_element:
