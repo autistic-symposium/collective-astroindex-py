@@ -2,8 +2,8 @@
 # src/utils/plot.py
 
 
-from datetime import datetime
 import matplotlib.pyplot as plt
+from src.utils.os import convert_date_format 
 
 
 FONT = {
@@ -20,7 +20,7 @@ def plot_collective(data: dict) -> None:
     plt.ylabel('Normalized Index', fontdict=FONT)
     plt.title('Collective Astro Index I', fontdict=FONT)
 
-    ordered_data = sorted(data.items(), key = lambda x: datetime.strptime(x[0], '%d-%m-%Y'))
+    ordered_data = sorted(data.items(), key = lambda x: convert_date_format(x[0]))
     x, y = zip(*ordered_data) 
     
     plt.plot(x, y)
