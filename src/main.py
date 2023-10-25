@@ -33,6 +33,7 @@ def run_menu() -> argparse.ArgumentParser:
 
 def run() -> None:
 
+    PRINT_PLOT = False
     parser = run_menu()
     args = parser.parse_args()
     c = CollectiveIndex()
@@ -63,7 +64,8 @@ def run() -> None:
 
     elif args.collective_index:
         c.get_collective_index()
-        plot_collective(c.collective_index)
+        if PRINT_PLOT: 
+            plot_collective(c.collective_index)
 
     else:
         parser.print_help()
