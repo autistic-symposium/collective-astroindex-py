@@ -63,6 +63,7 @@ def run() -> None:
 
     elif args.collective_index:
         c.get_collective_index()
+        plot_collective(c.collective_index)
 
     else:
         parser.print_help()

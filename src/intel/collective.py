@@ -39,7 +39,7 @@ class CollectiveIndex:
         self.moon_phase = {t: [] for t in ['date', 'phase']}
         self.planet_tropical = {}
         self.chart_data = {t: [] for t in ['houses', 'aspects']}
-        self.western_horoscope = {t: [] for t in ['planets', 'houses', 'aspects', 'ascendant', 'midheaven', 'vertex', 'lilith']}
+        self.western_horoscope = {t: [] for t in ['planets', 'houses', 'aspects', 'ascendant_angle', 'midheaven_angle', 'vertex_angle']}
 
         self.collective_index = {}
 
@@ -232,17 +232,17 @@ class CollectiveIndex:
 
     def _parse_western_horoscope(self, data: dict) -> None:
 
-        self.western_horoscope['ascendant'] = data['ascendant'].lower()
-        self.western_horoscope['midheaven'] = data['midheaven'].lower()
-        self.western_horoscope['vertex'] = data['vertex'].lower()
-        self.western_horoscope['planets']['lilith'] = {
-            'full_degree': data['lilith']['full_degree'],
-            'norm_degree': data['lilith']['norm_degree'],
-            'speed': data['lilith']['speed'],
-            'is_retrograde': data['lilith']['is_retro'],
-            'sign': data['lilith']['sign'].lower(),
-            'house': data['lilith']['house']
-        }
+        self.western_horoscope['ascendan_angle'] = data['ascendant']
+        self.western_horoscope['midheaven_angle'] = data['midheaven']
+        self.western_horoscope['vertex_angle'] = data['vertex']
+        self.western_horoscope['planets'] = { 'lilith': {
+                                    'full_degree': data['lilith']['full_degree'],
+                                    'norm_degree': data['lilith']['norm_degree'],
+                                    'speed': data['lilith']['speed'],
+                                    'is_retrograde': data['lilith']['is_retro'],
+                                    'sign': data['lilith']['sign'].lower(),
+                                    'house': data['lilith']['house']}
+                                }
 
         for item in data['planets']:
             self.western_horoscope['planets'][item['name'].lower()] = {
@@ -568,9 +568,9 @@ class CollectiveIndex:
         planets = self.western_horoscope['planets']
         houses = self.western_horoscope['houses']
         aspects = self.western_horoscope['aspects']
-        ascendant = self.western_horoscope['ascendant']
-        midheaven = self.western_horoscope['midheaven']
-        vertex = self.western_horoscope['vertex']
+        ascendant_angle = self.western_horoscope['ascendant_angle']
+        midheaven_angle = self.western_horoscope['midheaven_angle']
+        vertex_angle = self.western_horoscope['vertex_angle']
 
         index_here = 0
 
@@ -586,10 +586,6 @@ class CollectiveIndex:
 
         for aspect in aspects:
             index_here += self._calculate_index_for_aspect(aspect)
-
-        index_here += self._calculate_index_for_ascendant(ascendant)
-        index_here += self._calculate_index_for_midheaven(midheaven)
-        index_here += self._calculate_index_for_vertx(vertex)
 
         self.collective_index[self.api.get_request_date()] = index_here
 
@@ -675,7 +671,12 @@ class CollectiveIndex:
 
     def get_collective_index(self) -> None:
 
-        pass
-        # TODO: add all indexes
-        # TODO: add plot plot.plot_collective(self.collective_index, 'Collective Astro Index I')
-        # normalize index
+        self.get_transits_daily()
+        self.get_transits_monthly()
+        self.get_transits_natal_daily()
+        self.get_moon_phase()
+        self.get_planet_tropical()
+        self.get_chart_data()
+        self.get_western_horoscope()
+
+        os.log_info(f'Collective index: {self.collective_index}')

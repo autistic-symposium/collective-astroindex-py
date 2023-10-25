@@ -14,7 +14,7 @@ FONT = {
         }
 
 
-def plot_collective(data: dict, title) -> None:
+def plot_collective(data: dict) -> None:
 
     plt.xlabel('Date', fontdict=FONT)
     plt.ylabel('Normalized Index', fontdict=FONT)
