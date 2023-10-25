@@ -22,6 +22,21 @@ ascendant:
   pisces: slightly_bearish       # 5th house cancer, 8th house libra
 
 
+midheaven:
+  aries: neutral                 
+  taurus: neutral                
+  gemini: neutral               
+  cancer: neutral                
+  leo: neutral                   
+  virgo: neutral                 
+  libra: neutral                 
+  scorpio: neutral               
+  sagittarius: neutral           
+  capricorn: neutral             
+  aquarius: neutral              
+  pisces: neutral                
+
+
 houses:
   1: neutral
   2: slightly_bullish
@@ -56,10 +71,14 @@ planets:
   pluto: neutral
   rahu: super_bullish
   ketu: super_bearish
+  lilith: neutral
+  chiron: neutral
+
 
 retrograde:
   true: slightly_bullish   
   false: very_bearish            
+
 
 dignities:
   exalted: super_bullish
@@ -70,6 +89,19 @@ dignities:
   face: neutral
   peregrine: neutral
 
+vertex:
+  aries: neutral
+  taurus: neutral
+  gemini: neutral
+  cancer: neutral
+  leo: neutral
+  virgo: neutral
+  libra: neutral
+  scorpio: neutral
+  sagittarius: neutral
+  capricorn: neutral
+  aquarius: neutral
+  pisces: neutral
 
 
 ######################
@@ -94,11 +126,11 @@ aspects:
 ######################
 
 moon_phase:
-  'First Quarter Moon': bullish
-  'Full Moon': bearish
-  'Last Quarter Moon': unclear
-  'New Moon': bullish
-  'Waning Crescent Moon': unclear
-  'Waning Gibbous Moon': unclear
-  'Waxing Crescent Moon': unclear
-  'Waxing Gibbous Moon': unclear
+  'first quarter moon': bullish
+  'full moon': bearish
+  'last quarter moon': neutral
+  'new moon': bullish
+  'waning crescent moon': neutral
+  'waning gibbous moon': neutral
+  'waxing crescent moon': neutral
+  'waxing gibbous moon': neutral
