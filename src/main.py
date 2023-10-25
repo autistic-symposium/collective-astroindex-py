@@ -21,14 +21,14 @@ def run_menu() -> argparse.ArgumentParser:
                         help='Calculate index for moon_phase.')
     parser.add_argument('-e', dest='planet_tropical', action='store_true',
                         help='Calculate index for planet_tropical.')
-    parser.add_argument('-f', dest='natal_wheel', action='store_true',
-                        help='Calculate index for natal_wheel.')
-    parser.add_argument('-g', dest='chart_data', action='store_true',
+    parser.add_argument('-f', dest='chart_data', action='store_true',
                         help='Calculate index for chart_data.')
-    parser.add_argument('-i', dest='western_horoscope', action='store_true',
+    parser.add_argument('-g', dest='western_horoscope', action='store_true',
                         help='Calculate index for western_horoscope.')
-    parser.add_argument('-j', dest='collective_index', action='store_true',
-                        help='Calculate index for collective_index.')
+    parser.add_argument('-nw', dest='natal_wheel', action='store_true',
+                        help='Print natal wheel.')
+    parser.add_argument('-ci', dest='collective_index', action='store_true',
+                        help='Calculate total collective index.')
     return parser
 
 def run() -> None:

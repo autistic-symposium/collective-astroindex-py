@@ -610,9 +610,8 @@ class CollectiveIndex:
         self._parse_moon_phase(response)
         
         this_index = self._create_index_moon_phase()
-        this_date = self.api.get_request_date()
 
-        os.log_info(f'Index I.d ({this_date}): {this_index}')
+        os.log_info(f'Index I.d: {this_index}')
 
     
     def get_planet_tropical(self) -> None:
@@ -621,16 +620,9 @@ class CollectiveIndex:
         self._parse_planet_tropical(response)
 
         this_index = self._create_index_planet_tropical()
-        this_date = self.api.get_request_date()
 
-        os.log_info(f'Index I.e ({this_date}): {this_index}')
+        os.log_info(f'Index I.e: {this_index}')
         
-
-    def get_natal_wheel(self) -> None:
-
-        response = self.api.request_natal_wheel()
-        self._parse_natal_wheel(response)
-    
 
     def get_chart_data(self) -> None:
 
@@ -638,9 +630,8 @@ class CollectiveIndex:
         self._parse_chart_data(response)
 
         this_index = self._create_index_chart_data()
-        this_date = self.api.get_request_date()
 
-        os.log_info(f'Index I.g ({this_date}): {this_index}')
+        os.log_info(f'Index I.f: {this_index}')
 
 
     def get_western_horoscope(self) -> None:
@@ -649,11 +640,18 @@ class CollectiveIndex:
         self._parse_western_horoscope(response)
 
         this_index = self._create_index_western_horoscope()
-        this_date = self.api.get_request_date()
 
-        os.log_info(f'Index I.h ({this_date}): {this_index}')
+        os.log_info(f'Index I.g: {this_index}')
 
-    
+
+    def get_natal_wheel(self) -> None:
+
+        response = self.api.request_natal_wheel()
+        url = self._parse_natal_wheel(response)
+
+        os.log_info(f'Chart created: {url}')
+
+
     def get_collective_index(self) -> None:
 
         pass
