@@ -1,7 +1,6 @@
 # -*- encoding: utf-8 -*-
 # src/utils/plot.py
 
-
 import matplotlib.pyplot as plt
 from src.utils.os import convert_date_format 
 
