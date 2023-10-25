@@ -21,6 +21,8 @@ class CollectiveIndex:
         self.dignities_info = self._load_general_info('STRATEGIES_GENERAL', 'dignities')
         
         self.ascendant_intel = self._load_intel('STRATEGIES_COLLECTIVE', 'ascendant')
+        self.midheaven_intel = self._load_intel('STRATEGIES_COLLECTIVE', 'midheaven')
+        self.vertex_intel = self._load_intel('STRATEGIES_COLLECTIVE', 'vertex')
         self.houses_intel = self._load_intel('STRATEGIES_COLLECTIVE', 'houses')
         self.planet_intel = self._load_intel('STRATEGIES_COLLECTIVE', 'planets')
         self.retrograde_intel = self._load_intel('STRATEGIES_COLLECTIVE', 'retrograde')
@@ -229,60 +231,42 @@ class CollectiveIndex:
 
 
     def _parse_western_horoscope(self, data: dict) -> None:
-        # TODO
 
-        for key, values in data.items():
+        self.western_horoscope['ascendant'] = data['ascendant'].lower()
+        self.western_horoscope['midheaven'] = data['midheaven'].lower()
+        self.western_horoscope['vertex'] = data['vertex'].lower()
+        self.western_horoscope['planets']['lilith'] = {
+            'full_degree': data['lilith']['full_degree'],
+            'norm_degree': data['lilith']['norm_degree'],
+            'speed': data['lilith']['speed'],
+            'is_retrograde': data['lilith']['is_retro'],
+            'sign': data['lilith']['sign'].lower(),
+            'house': data['lilith']['house']
+        }
 
-            if key == 'planets':
-                for value in values:
-                    planet = value['name']
-                    full_degree = value['full_degree']
-                    norm_degree = value['norm_degree']
-                    speed = value['speed']
-                    is_retrograde = value['is_retro']
-                    sign = value['sign'].lower()
-                    house = value['house']
+        for item in data['planets']:
+            self.western_horoscope['planets'][item['name'].lower()] = {
+                'full_degree': item['full_degree'],
+                'norm_degree': item['norm_degree'],
+                'speed': item['speed'],
+                'is_retrograde': item['is_retro'],
+                'sign': item['sign'].lower(),
+                'house': item['house']}
 
-                    self.whole_sign_houses['planets'].append((planet, full_degree, norm_degree, speed, is_retrograde, sign, house))
+        for item in data['houses']:
+            self.western_horoscope['houses'].append({'house': item['house'],
+                                                     'sign': item['sign'].lower(),
+                                                     'degree': item['degree']})
 
-            elif key == 'houses':
-                for value in values:
-                    house = value['house']
-                    sign = value['sign'].lower()
-                    degree = value['degree']
+        for item in data['aspects']:
+            self.western_horoscope['aspects'].append({'natal_planet': item['aspected_planet'].lower(),
+                                                      'transit_planet': item['aspecting_planet'].lower(),
+                                                      'aspect_type': item['type'].lower(),
+                                                      'orb': item['orb'],
+                                                      'diff': item['diff']})
+            
 
-                    self.whole_sign_houses['houses'].append((house, sign, degree))
-
-            elif key == 'ascendant':
-                self.whole_sign_houses['ascendant'] = values
-
-            elif key == 'midheaven':
-                self.whole_sign_houses['midheaven'] = values
         
-            elif key == 'vertex':
-                self.whole_sign_houses['vertex'] = values
-
-            elif key == 'lilith':
-                full_degree = values['full_degree']
-                norm_degree = values['norm_degree']
-                speed = values['speed']
-                is_retrograde = values['is_retro']
-                sign = values['sign'].lower()
-                house = values['house']
-                
-                self.whole_sign_houses['lilith'] = (full_degree, norm_degree, speed, is_retrograde, sign, house)
-
-            elif key == 'aspects':
-                for value in values:
-                    aspecting_planet = value['aspecting_planet'].lower()
-                    aspected_planet = value['aspected_planet'].lower()
-                    aspect = value['type'].lower()
-                    orb = value['orb']
-                    diff = value['diff']
-
-                    self.whole_sign_houses['aspects'].append((aspected_planet, aspecting_planet, aspect, orb, diff))
-
-
     #############################################
     #    Private methods: Intel for indexes
     #############################################
@@ -294,6 +278,21 @@ class CollectiveIndex:
         else:
             return 0
     
+
+    def _calculate_intel_for_midheaven(self, midheaven) -> int:
+            
+            if midheaven in self.ascendant_intel:
+                return self.midheaven_intel[midheaven]
+            else:
+                return 0
+
+    def _calculate_index_for_vertex(self, vertex) -> int:
+
+        if vertex in self.ascendant_intel:
+            return self.vertex_intel[vertex]
+        else:
+            return 0
+
 
     def _calculate_intel_for_retrograde(self, is_retrograde) -> int:
 
@@ -356,6 +355,16 @@ class CollectiveIndex:
     def _calculate_index_for_ascendant(self, ascendant) -> int:
 
         return self._calculate_intel_for_ascendant(ascendant)
+
+    
+    def _calculate_index_for_midheaven(self, midheaven) -> int:
+
+        return self._calculate_intel_for_midheaven(midheaven)
+
+    
+    def _calculate_index_for_vertex(self, vertex) -> int:
+
+        return self._calculate_intel_for_vertex(vertex)
     
 
     def _calculate_index_for_houses_by_planet(self, houses) -> int:
@@ -555,28 +564,36 @@ class CollectiveIndex:
 
 
     def _create_index_western_horoscope(self) -> dict:
-        # TODO
-
-        this_index = 0
-        houses_ranking = self.collective_intel['investing_houses']
-        aspects_ranking = self.general_intel['angle_aspects_ranking']
-
-        for planet in self.whole_sign_houses['planets']:
-            planet, full_degree, norm_degree, speed, is_retrograde, sign, house = planet
-            if house in houses_ranking:
-                this_index += float(self.sentiment_ranking['super_bullish'])
         
-        for aspect in self.whole_sign_houses['aspects']:
-            aspected_planet, aspecting_planet, aspect, orb, diff = aspect
-            # the api has a typo 'semi sqaure'
-            if aspect in aspects_ranking:
-                this_index += float(aspects_ranking[aspect])
-            else:
-                os.log_debug(f'Aspect {aspect} not found in aspects_ranking')
-        
-        # TODO: deal with houses, midheaven, vertex, lilith
+        planets = self.western_horoscope['planets']
+        houses = self.western_horoscope['houses']
+        aspects = self.western_horoscope['aspects']
+        ascendant = self.western_horoscope['ascendant']
+        midheaven = self.western_horoscope['midheaven']
+        vertex = self.western_horoscope['vertex']
 
-        return this_index
+        index_here = 0
+
+        for planet, data in planets.items():
+            index_here += self._calculate_intel_for_planet(planet)
+            index_here += self._calculate_intel_for_sign(data['sign'], planet)
+            index_here += self._calculate_intel_for_house(data['house'])
+            index_here += self._calculate_intel_for_retrograde(data['is_retrograde'])
+
+        for house in houses:
+            index_here += self._calculate_intel_for_house(house['house'])
+            index_here += self._calculate_intel_for_sign(house['sign'], 'ascendant')
+
+        for aspect in aspects:
+            index_here += self._calculate_index_for_aspect(aspect)
+
+        index_here += self._calculate_index_for_ascendant(ascendant)
+        index_here += self._calculate_index_for_midheaven(midheaven)
+        index_here += self._calculate_index_for_vertx(vertex)
+
+        self.collective_index[self.api.get_request_date()] = index_here
+
+        return index_here
 
 
     #############################

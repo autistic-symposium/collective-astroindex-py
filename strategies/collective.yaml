@@ -22,6 +22,21 @@ ascendant:
   pisces: slightly_bearish       # 5th house cancer, 8th house libra
 
 
+midheaven:
+  aries: neutral                 
+  taurus: neutral                
+  gemini: neutral               
+  cancer: neutral                
+  leo: neutral                   
+  virgo: neutral                 
+  libra: neutral                 
+  scorpio: neutral               
+  sagittarius: neutral           
+  capricorn: neutral             
+  aquarius: neutral              
+  pisces: neutral                
+
+
 houses:
   1: neutral
   2: slightly_bullish
@@ -56,6 +71,8 @@ planets:
   pluto: neutral
   rahu: super_bullish
   ketu: super_bearish
+  lilith: neutral
+  chiron: neutral
 
 
 retrograde:
@@ -72,6 +89,19 @@ dignities:
   face: neutral
   peregrine: neutral
 
+vertex:
+  aries: neutral
+  taurus: neutral
+  gemini: neutral
+  cancer: neutral
+  leo: neutral
+  virgo: neutral
+  libra: neutral
+  scorpio: neutral
+  sagittarius: neutral
+  capricorn: neutral
+  aquarius: neutral
+  pisces: neutral
 
 
 ######################
