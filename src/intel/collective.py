@@ -180,21 +180,17 @@ class CollectiveIndex:
 
 
     def _parse_planet_tropical(self, data: dict) -> None:
-        # TODO
 
-        for obj in data:
-            planet = obj['name'].lower()
-            full_degree = obj['fullDegree']
-            norm_degree = obj['normDegree']
-            speed = obj['speed']
-            is_retrograde = obj['isRetro']
-            sign = obj['sign'].lower()
-            house = obj['house']
+        for item in data:
+            planet = item['name'].lower()
+            full_degree = item['fullDegree']
+            norm_degree = item['normDegree']
+            speed = item['speed']
+            is_retrograde = item['isRetro']
+            sign = item['sign'].lower()
+            house = item['house']
             
-            if planet == 'Ascendant':
-                self.ascendant_now = sign
-            
-            self.transit_forecast[planet] = [full_degree, norm_degree, speed, is_retrograde, sign, house]
+            self.planet_tropical[planet] = (full_degree, norm_degree, speed, is_retrograde, sign, house)
 
 
     def _parse_chart_data(self, data: dict) -> None:
@@ -292,7 +288,7 @@ class CollectiveIndex:
     def _calculate_intel_for_retrograde(self, is_retrograde) -> int:
 
         if is_retrograde is not None:
-            return self.retrograde_intel[is_retrograde]
+            return self.retrograde_intel[bool(is_retrograde)]
         else:
             return 0
         
@@ -490,30 +486,18 @@ class CollectiveIndex:
 
 
     def _create_index_planet_tropical(self) -> dict:
-        # TODO
-
-        this_index = 0
-        super_bullish_planets = self.collective_intel['super_bullish_planets']
-        investing_houses = self.collective_intel['investing_houses']
-        planets_exaltation = self.general_intel['planets_exaltation']
-    
-        for planet, data in self.transit_forecast.items():
-            full_degree, norm_degree, speed, is_retrograde, sign, house = data
-
-            if planet in planets_exaltation:
-                this_index += float(self.feature_ranking['exalted_planet'])
-            
-            if planet in self.retrogrades_now:
-                this_index -= float(self.feature_ranking['retrograde_planet'])
-            
-            if house in investing_houses:
-                this_index += float(self.sentiment_ranking['super_bullish'])
-            
-            if planet in super_bullish_planets:
-                this_index += float(self.sentiment_ranking['super_bullish'])
-            
         
-        return this_index
+        planets = self.planet_tropical
+        index_here = 0
+
+        for planet, data in planets.items():
+            full_degree, norm_degree, speed, is_retrograde, sign, house = data
+            index_here += self._calculate_intel_for_planet(planet)
+            index_here += self._calculate_intel_for_sign(sign, planet)
+            index_here += self._calculate_intel_for_house(house)
+            index_here += self._calculate_intel_for_retrograde(is_retrograde)
+
+        return index_here
 
 
     def _create_index_chart_data(self) -> dict:
