@@ -34,7 +34,7 @@ class CollectiveIndex:
         self.transit_daily = {t: [] for t in ['ascendant', 'date', 'houses', 'aspects']}
         self.transit_monthly = {t: [] for t in ['aspects', 'moon_phase']}
         self.transits_natal_daily = {t: [] for t in ['ascendant', 'date', 'aspects']}
-        self.moon_phase = {}
+        self.moon_phase = {t: [] for t in ['date', 'phase']}
         self.planet_tropical = {}
         self.chart_data = {t: [] for t in ['houses', 'aspects']}
         self.western_horoscope = {t: [] for t in ['planets', 'houses', 'aspects', 'ascendant', 'midheaven', 'vertex', 'lilith']}
@@ -124,15 +124,15 @@ class CollectiveIndex:
                                     'aspect_type': aspect_type,
                                     'orb': orb}
 
-        self.transit_monthly['moon_phase'] = {}
+        self.transit_monthly['phase'] = {}
         for moon_phase in data['moon_phase']:
-            phase_type = moon_phase['phase_type'].lower()
+            phase = moon_phase['phase_type'].lower()
             date = os.convert_date_format(moon_phase['date'].split('T'))
             sign = moon_phase['sign'].lower()
             house = moon_phase['house']
             
-            self.transit_monthly['moon_phase'][date] = {
-                                    'phase_type': phase_type,
+            self.transit_monthly['phase'][date] = {
+                                    'phase': phase,
                                     'sign': sign,
                                     'house': house}    
 
@@ -174,13 +174,9 @@ class CollectiveIndex:
 
 
     def _parse_moon_phase(self, data: dict) -> None:
-        # TODO
 
-        self.moon_phase[data['considered_date']] = data['moon_phase']
-        significance = data['significance']
-
-        print(f'Moon phase: {self.moon_phase}')
-        print(f'Significance: {significance}')
+        self.moon_phase['date'] = os.convert_date_format(data['considered_date'])
+        self.moon_phase['phase'] = data['moon_phase'].lower()
 
 
     def _parse_planet_tropical(self, data: dict) -> None:
@@ -399,17 +395,17 @@ class CollectiveIndex:
 
 
     def _calculate_index_for_moon_phase(self, phase) -> int:
-            
-        sign = phase['sign']
-        house = phase['house']
-        phase_type = phase['phase_type']
 
+        phase_type = phase['phase']    
+        sign = phase['sign'] if 'sign' in phase else None
+        house = phase['house'] if 'house' in phase else None    
+        
         phase_index = self.moon_phase_intel[phase_type] 
         planet_index = self._calculate_intel_for_planet('moon')
         house_index = self._calculate_intel_for_house(house)
         sign_index = self._calculate_intel_for_sign(sign, 'moon')
 
-        return phase_index * (planet_index + house_index + dignities_index)
+        return phase_index * (planet_index + house_index + sign_index)
         
     
     #############################################
@@ -442,7 +438,7 @@ class CollectiveIndex:
     def _create_index_transits_monthly(self) -> None:
 
         aspects = self.transit_monthly['aspects']
-        moon_phase = self.transit_monthly['moon_phase']
+        phase = self.transit_monthly['phase']
 
         for date, aspect in aspects.items():
             index_aspect = self._calculate_index_for_aspect(aspect)
@@ -451,7 +447,7 @@ class CollectiveIndex:
             else:
                 self.collective_index[date] = index_aspect
 
-        for date, phase in moon_phase.items():
+        for date, phase in phase.items():
             index_phase = self._calculate_index_for_moon_phase(phase)
             if date in self.collective_index:
                 self.collective_index[date] += index_phase
@@ -480,22 +476,17 @@ class CollectiveIndex:
 
 
     def _create_index_moon_phase(self) -> dict:
-        # TODO
+        
+        phase = self.moon_phase
+        date = phase['date']
+        index_here = self._calculate_index_for_moon_phase(phase)
 
-        this_index = 0
-        moon_phases_ranking = self.moon_intel['phase']
-
-        for date, phase in self.moon_phase.items():
-            this_ranking = moon_phases_ranking[phase]
-            # TODO: fix this
-            #this_index += float(self.ranking[this_ranking])
-
-        if date in self.transit_index:
-            self.transit_index[date] += this_index
+        if date in self.collective_index:
+            self.collective_index[date] += index_here
         else:
-            self.transit_index[date] = this_index
+            self.collective_index[date] = index_here
 
-        return this_index
+        return index_here
 
 
     def _create_index_planet_tropical(self) -> dict:
@@ -648,9 +639,6 @@ class CollectiveIndex:
         this_index = self._create_index_western_horoscope()
 
         os.log_info(f'Index I.g: {this_index}')
-
-
-
 
 
     def get_collective_index(self) -> None:
