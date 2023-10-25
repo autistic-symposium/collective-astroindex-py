@@ -72,6 +72,14 @@ class CollectiveIndex:
     #   Private methods: Parsing the response data
     ################################################
 
+    def _parse_natal_wheel(self, data: dict) -> None:
+
+        if 'status' in data and data['status'] == True:
+            os.log_info(f'Chart created: {data["chart_url"]}')
+        else:
+            os.log_error(f'Error creating chart: {data["message"]}')
+        
+
     def _parse_transits_daily(self, data: dict) -> None:
 
         self.transit_daily['ascendant'] = data['ascendant'].lower()
@@ -191,14 +199,6 @@ class CollectiveIndex:
                 self.ascendant_now = sign
             
             self.transit_forecast[planet] = [full_degree, norm_degree, speed, is_retrograde, sign, house]
-            
-
-    def _parse_natal_wheel(self, data: dict) -> None:
-        # TODO
-
-        if data['status'] == True:
-            url = data['chart_url']
-            os.log_info(f'Wheel created: {url}')
 
 
     def _parse_chart_data(self, data: dict) -> None:
@@ -577,6 +577,12 @@ class CollectiveIndex:
     #       Public methods
     #############################
 
+    def get_natal_wheel(self) -> None:
+
+        response = self.api.request_natal_wheel()
+        self._parse_natal_wheel(response)
+
+
     def get_transits_daily(self) -> None:
 
         response = self.api.request_transits_daily()
@@ -644,12 +650,7 @@ class CollectiveIndex:
         os.log_info(f'Index I.g: {this_index}')
 
 
-    def get_natal_wheel(self) -> None:
 
-        response = self.api.request_natal_wheel()
-        url = self._parse_natal_wheel(response)
-
-        os.log_info(f'Chart created: {url}')
 
 
     def get_collective_index(self) -> None:
