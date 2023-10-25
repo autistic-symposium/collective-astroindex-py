@@ -215,15 +215,15 @@ class CollectiveIndex:
                                               'planets': planets})
 
         for item in data['aspects']:
-            aspected_planet = item['aspected_planet'].lower()
-            aspecting_planet = item['aspecting_planet'].lower()
-            aspect = item['type'].lower()
+            natal_planet = item['aspected_planet'].lower()
+            transit_planet = item['aspecting_planet'].lower()
+            aspect_type = item['type'].lower()
             orb = item['orb']
             diff = item['diff']
 
-            self.chart_data['aspects'].append({'aspected_planet': aspected_planet,
-                                               'aspecting_planet': aspecting_planet,
-                                               'aspect': aspect,
+            self.chart_data['aspects'].append({'natal_planet': natal_planet,
+                                               'transit_planet': transit_planet,
+                                               'aspect_type': aspect_type,
                                                'orb': orb,
                                                'diff': diff})   
 
@@ -543,10 +543,11 @@ class CollectiveIndex:
 
         houses = self.chart_data['houses']
         aspects = self.chart_data['aspects']
-        index_here = 0
 
-        index_here += self._calculate_index_for_houses_by_planets(houses)
-        #index_here += self._calculate_index_for_aspect(aspects)
+        index_here = self._calculate_index_for_houses_by_planets(houses)
+
+        for aspect in aspects:
+            index_here += self._calculate_index_for_aspect(aspect)
 
         self.collective_index[self.api.get_request_date()] = index_here
 
