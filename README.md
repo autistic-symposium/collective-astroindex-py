@@ -1,4 +1,4 @@
-## AstroIDX I: Collective
+## Collective Astro Index
 
 <br>
 
