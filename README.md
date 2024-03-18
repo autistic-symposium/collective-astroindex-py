@@ -1,48 +1,24 @@
-## Collective Astro Index
+## collective Astro Index
 
 <br>
 
-* In this package, we build a "collective astrological index" using several collective transit features.
-* We leverage data from the following sources (with wrappers inside `src/datalake`):
-    * [astrology api](https://astrologyapi.com/docs/api-ref)
-* The intel files for the features are located inside `strategies/` and parsed in the files located inside `src/intel/`.
-* The CLI can be used to inspect the several endpoints and plot the data.
-* This is a work in progress.
+#### 👉🏼 quick and dirty proof-of-concept to calculate a collective financial bullish/bearish index, using several western astrological features.
 
 <br>
 
+### tl; dr
 
-<p align="center">
-<img src="docs/results_2023_10_24.png" width="80%" align="center" style="padding:1px;border:1px solid black;"/>
-
-
+* in this package, we build a "collective astrological index" using several collective transit features
+* we leverage data from the [astrology api](https://astrologyapi.com/docs/api-ref) (with wrappers inside `src/datalake`) 
+* the intel files for the features are located inside `strategies/` and parsed in the files located inside `src/intel/`
+* the CLI can be used to inspect the several endpoints and plot the data.
+* this is a work in progress.
 
 <br>
 
 ---
 
-## todo
-
-- [ ] create unit tests (and mock requests)
-- [ ] improve intel files (e.g., on path of fortune, sign, north node, eclipses, better moon forecast, void of course, progressed, etc.)
-- [ ] add multithreading
-- [ ] add cache and database
-- [ ] improve scores and normalize them
-- [ ] dockerize and make it ready for ingestion 
-- [ ] backtest with old data
-- [ ] [move out from `setup.py`](https://blog.ganssle.io/articles/2021/10/setup-py-deprecated.html)
-- [ ] add a linter
-
-##### for next indexes
-
-- [ ] add natal info from user
-- [ ] add token info
-
-<br>
-
-----
-
-## installing
+### installing
 
 <br>
 
@@ -72,9 +48,9 @@ make install
 
 ---
 
-## CLI tool
+### CLI tool
 
-### `transit_daily`
+#### `transit_daily`
 
 <br>
 
@@ -86,7 +62,7 @@ make install
 
 <br>
 
-### `transit_monthly`
+#### `transit_monthly`
 
 <br>
 
@@ -98,7 +74,7 @@ make install
 
 <br>
 
-### `transit_natal_daily`
+#### `transit_natal_daily`
 
 <br>
 
@@ -110,7 +86,7 @@ make install
 
 <br>
 
-### `moon_phase`
+#### `moon_phase`
 
 <br>
 
@@ -122,7 +98,7 @@ make install
 
 <br>
 
-### `planet_tropical`
+#### `planet_tropical`
 
 <br>
 
@@ -132,7 +108,7 @@ make install
 Index I.e: 51.0
 ```
 
-### `chart_data`
+#### `chart_data`
 
 <br>
 
@@ -144,7 +120,7 @@ Index I.e: 51.0
 
 <br>
 
-### `western_horoscope`
+#### `western_horoscope`
 
 <br>
 
@@ -156,7 +132,7 @@ Index I.e: 51.0
 
 <br>
 
-### `natal_wheel`
+#### `natal_wheel`
 
 <br>
 
@@ -168,7 +144,7 @@ Index I.e: 51.0
 
 <br>
 
-### `collective_index`
+#### `collective_index`
 
 
 <br>
@@ -184,12 +160,12 @@ Index I.e: 51.0
 
 ---
 
-## intel files
+### intel files
 
 <br>
 
 
-### `rankings.yaml`
+#### `rankings.yaml`
 
 <br>
 
@@ -225,7 +201,7 @@ sentiments:
 <br>
 
 
-### `collective.yaml`
+#### `collective.yaml`
 
 
 <br>
@@ -371,7 +347,7 @@ moon_phase:
 
 <br>
 
-### `general.yaml`
+#### `general.yaml`
 
 <br>
 
@@ -542,7 +518,7 @@ dignities_by_angles:
 
 <br>
 
-### `planet_aspects.yaml`
+#### `planet_aspects.yaml`
 
 <br>
 
