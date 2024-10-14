@@ -1,18 +1,17 @@
-## collective Astro Index
+## collective astro index
 
 <br>
 
-#### 👉🏼 quick and dirty proof-of-concept to calculate a collective financial bullish/bearish index, using several western astrological features.
+#### 👉🏼 quick-and-dirty proof-of-concept to calculate a collective financial bullish/bearish index, using several western astrological features
 
 <br>
 
 ### tl; dr
 
 * in this package, we build a "collective astrological index" using several collective transit features
-* we leverage data from the [astrology api](https://astrologyapi.com/docs/api-ref) (with wrappers inside `src/datalake`) 
+* we leverage data from the **[astrology api](https://astrologyapi.com/docs/api-ref)** (with wrappers inside `src/datalake`) 
 * the intel files for the features are located inside `strategies/` and parsed in the files located inside `src/intel/`
-* the CLI can be used to inspect the several endpoints and plot the data.
-* this is a work in progress.
+* the CLI can be used to inspect several endpoints and plot the data
 
 <br>
 
@@ -49,6 +48,8 @@ make install
 ---
 
 ### CLI tool
+
+<br>
 
 #### `transit_daily`
 
@@ -209,7 +210,7 @@ sentiments:
 ```yaml
 # this is a list of all the strategies that are used in the collective strategy
 # they are generally used to determine the overall market sentiment
-# and they are a high level intel of transits
+# and they are a high-level intel of transits
 
 
 ######################
